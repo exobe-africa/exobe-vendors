@@ -26,6 +26,12 @@ export default function NewProductPage() {
     setOptions(options.filter((_, i) => i !== index));
   };
 
+  const handleOptionNameChange = (index: number, name: string) => {
+    const updatedOptions = [...options];
+    updatedOptions[index] = { ...updatedOptions[index], name };
+    setOptions(updatedOptions);
+  };
+
   const handleAddVariant = () => {
     setVariants([...variants, { 
       sku: '', 
@@ -178,6 +184,7 @@ export default function NewProductPage() {
                         label="Option Name"
                         placeholder="e.g. Size, Color, Material"
                         value={option.name}
+                        onChange={(e) => handleOptionNameChange(index, e.target.value)}
                       />
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1.5">
