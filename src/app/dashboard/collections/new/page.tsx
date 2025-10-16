@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -11,7 +12,8 @@ import { ArrowLeft, Upload, X, Search, Plus } from 'lucide-react';
 
 export default function NewCollectionPage() {
   const router = useRouter();
-  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
+  interface SelectedProduct { id: string; title: string; sku: string; image: string }
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -94,11 +96,7 @@ export default function NewCollectionPage() {
                 <div className="space-y-2">
                   {selectedProducts.map((product) => (
                     <div key={product.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="w-12 h-12 rounded object-cover"
-                      />
+                      <Image src={product.image} alt={product.title} width={48} height={48} className="w-12 h-12 rounded object-cover" />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{product.title}</p>
                         <p className="text-sm text-gray-500">{product.sku}</p>

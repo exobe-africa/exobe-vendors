@@ -35,7 +35,7 @@ export default function LoginPage() {
       
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err) {
+    } catch (_err) {
       setError('Invalid email or password. Please try again.');
       setLoading(false);
     }
@@ -147,7 +147,7 @@ export default function LoginPage() {
         {/* Sign Up Link */}
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
               href="https://exobe.co.za/become-a-seller"
               className="font-medium text-red-600 hover:text-red-700"

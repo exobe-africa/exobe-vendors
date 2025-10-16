@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -12,8 +13,11 @@ import Link from 'next/link';
 
 export default function NewProductPage() {
   const router = useRouter();
-  const [variants, setVariants] = useState<any[]>([]);
-  const [options, setOptions] = useState<any[]>([
+  interface ProductOption { name: string; values: string[] }
+  interface ProductVariant { sku: string; price: number; stock: number; attributes: Record<string, string> }
+
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [options, setOptions] = useState<ProductOption[]>([
     { name: 'Size', values: ['Small', 'Medium', 'Large'] },
   ]);
   const [images, setImages] = useState<string[]>([]);
@@ -33,12 +37,7 @@ export default function NewProductPage() {
   };
 
   const handleAddVariant = () => {
-    setVariants([...variants, { 
-      sku: '', 
-      price: 0, 
-      stock: 0, 
-      attributes: {} 
-    }]);
+    setVariants([...variants, { sku: '', price: 0, stock: 0, attributes: {} }]);
   };
 
   return (
@@ -106,7 +105,7 @@ export default function NewProductPage() {
                 <div className="grid grid-cols-4 gap-4">
                   {images.map((img, index) => (
                     <div key={index} className="relative group">
-                      <img src={img} alt="" className="w-full h-24 object-cover rounded-lg" />
+                      <Image src={img} alt="" width={200} height={96} className="w-full h-24 object-cover rounded-lg" />
                       <button className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                         <X className="w-4 h-4" />
                       </button>

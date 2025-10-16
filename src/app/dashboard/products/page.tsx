@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -130,11 +131,7 @@ export default function ProductsPage() {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="w-12 h-12 rounded-lg object-cover bg-gray-100"
-                      />
+                      <Image src={product.image} alt={product.title} width={48} height={48} className="w-12 h-12 rounded-lg object-cover bg-gray-100" />
                       <div>
                         <p className="font-medium text-gray-900">{product.title}</p>
                         {product.featured && (

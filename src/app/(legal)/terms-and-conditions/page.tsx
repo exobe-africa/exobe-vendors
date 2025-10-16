@@ -25,7 +25,7 @@ export default function TermsAndConditionsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction and Acceptance</h2>
               <p className="text-gray-700 mb-4">
-                Welcome to the eXobe Vendor Portal. These Terms and Conditions ("Terms") govern your use of the eXobe vendor platform and services. By accessing or using the platform, you agree to be bound by these Terms.
+                Welcome to the eXobe Vendor Portal. These Terms and Conditions (&quot;Terms&quot;) govern your use of the eXobe vendor platform and services. By accessing or using the platform, you agree to be bound by these Terms.
               </p>
               <p className="text-gray-700">
                 If you do not agree with these Terms, you must not use the platform. We reserve the right to modify these Terms at any time, and your continued use constitutes acceptance of any changes.
@@ -35,11 +35,11 @@ export default function TermsAndConditionsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Definitions</h2>
               <ul className="list-disc pl-6 text-gray-700 mb-4 space-y-2">
-                <li><strong>"Platform"</strong> refers to the eXobe Vendor Portal and all related services</li>
-                <li><strong>"Vendor"</strong> or <strong>"You"</strong> refers to the seller using the platform</li>
-                <li><strong>"Customer"</strong> refers to end users purchasing from vendors</li>
-                <li><strong>"Products"</strong> refers to goods or services listed by vendors</li>
-                <li><strong>"eXobe"</strong>, <strong>"We"</strong>, or <strong>"Us"</strong> refers to eXobe (Pty) Ltd</li>
+                <li><strong>&quot;Platform&quot;</strong> refers to the eXobe Vendor Portal and all related services</li>
+                <li><strong>&quot;Vendor&quot;</strong> or <strong>&quot;You&quot;</strong> refers to the seller using the platform</li>
+                <li><strong>&quot;Customer&quot;</strong> refers to end users purchasing from vendors</li>
+                <li><strong>&quot;Products&quot;</strong> refers to goods or services listed by vendors</li>
+                <li><strong>&quot;eXobe&quot;</strong>, <strong>&quot;We&quot;</strong>, or <strong>&quot;Us&quot;</strong> refers to eXobe (Pty) Ltd</li>
               </ul>
             </section>
 
@@ -110,7 +110,7 @@ export default function TermsAndConditionsPage() {
               
               <h3 className="text-xl font-semibold text-gray-900 mb-3">5.1 Commission Structure</h3>
               <p className="text-gray-700 mb-4">
-                eXobe charges a commission on each sale. Commission rates vary by category and will be communicated to you upon registration. We reserve the right to modify commission rates with 30 days' notice.
+                eXobe charges a commission on each sale. Commission rates vary by category and will be communicated to you upon registration. We reserve the right to modify commission rates with 30 days&apos; notice.
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 mb-3">5.2 Payment Processing</h3>
@@ -184,7 +184,7 @@ export default function TermsAndConditionsPage() {
 
               <h3 className="text-xl font-semibold text-gray-900 mb-3">9.2 By You</h3>
               <p className="text-gray-700">
-                You may close your account at any time with 30 days' notice. You remain responsible for fulfilling pending orders and outstanding obligations.
+                You may close your account at any time with 30 days&apos; notice. You remain responsible for fulfilling pending orders and outstanding obligations.
               </p>
             </section>
 
