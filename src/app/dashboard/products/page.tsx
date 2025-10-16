@@ -169,8 +169,8 @@ export default function ProductsPage() {
                     {product.price !== undefined ? `R ${product.price.toFixed(2)}` : '—'}
                   </td>
                   <td className="py-4 px-6">
-                    <span className={`text-sm font-medium ${product.stock > 0 ? 'text-gray-900' : 'text-red-600'}`}>
-                      {product.stock > 0 ? `${product.stock} units` : 'Out of stock'}
+                    <span className={`text-sm font-medium ${(product.stock ?? 0) > 0 ? 'text-gray-900' : 'text-red-600'}`}>
+                      {product.stock !== undefined ? (product.stock > 0 ? `${product.stock} units` : 'Out of stock') : '—'}
                     </span>
                   </td>
                   <td className="py-4 px-6">
