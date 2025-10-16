@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
@@ -8,54 +8,68 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Plus, Search, Filter, Edit, Trash2, Eye, MoreVertical } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
+import { getApolloClient } from '@/lib/apollo/client';
+import { SEARCH_PRODUCTS, DELETE_PRODUCT } from '@/lib/api/products';
 
-// Mock data - will be replaced with GraphQL
-const products = [
-  {
-    id: '1',
-    title: 'Premium Wireless Headphones',
-    category: 'Electronics',
-    status: 'ACTIVE',
-    price: 1499.99,
-    stock: 45,
-    image: 'https://via.placeholder.com/80',
-    featured: true,
-  },
-  {
-    id: '2',
-    title: 'Ergonomic Office Chair',
-    category: 'Furniture',
-    status: 'ACTIVE',
-    price: 3499.00,
-    stock: 12,
-    image: 'https://via.placeholder.com/80',
-    featured: false,
-  },
-  {
-    id: '3',
-    title: 'Smart Watch Series 5',
-    category: 'Electronics',
-    status: 'DRAFT',
-    price: 2999.99,
-    stock: 0,
-    image: 'https://via.placeholder.com/80',
-    featured: false,
-  },
-  {
-    id: '4',
-    title: 'Organic Cotton T-Shirt',
-    category: 'Apparel',
-    status: 'ACTIVE',
-    price: 299.99,
-    stock: 156,
-    image: 'https://via.placeholder.com/80',
-    featured: true,
-  },
-];
+interface UiProduct {
+  id: string;
+  title: string;
+  category?: string;
+  status?: string;
+  price?: number;
+  stock?: number;
+  image?: string;
+  featured?: boolean;
+}
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [items, setItems] = useState<UiProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const client = getApolloClient();
+  const { user } = useAuthStore();
+
+  const variables = useMemo(() => ({
+    query: searchQuery || undefined,
+    status: statusFilter === 'all' ? undefined : statusFilter,
+    vendorId: undefined as string | undefined, // backend infers by user; pass if you store vendorId
+    limit: 50,
+  }), [searchQuery, statusFilter]);
+
+  useEffect(() => {
+    let ignore = false;
+    const run = async () => {
+      setLoading(true);
+      try {
+        const { data } = await client.query({ query: SEARCH_PRODUCTS, variables, fetchPolicy: 'no-cache' });
+        const payload = JSON.parse((data as any).searchProducts || '{}');
+        const rows = Array.isArray(payload.items) ? payload.items : [];
+        const mapped: UiProduct[] = rows.map((r: any) => ({
+          id: r.id,
+          title: r.title,
+          category: r.category?.name,
+          status: r.status,
+          price: r.defaultVariant?.priceCents ? r.defaultVariant.priceCents / 100 : undefined,
+          stock: r.defaultVariant?.stockQuantity,
+          image: r.media?.[0]?.url,
+          featured: r.featured,
+        }));
+        if (!ignore) setItems(mapped);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+    run();
+    return () => { ignore = true; };
+  }, [client, variables]);
+
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this product?')) return;
+    await client.mutate({ mutation: DELETE_PRODUCT, variables: { id } });
+    setItems(prev => prev.filter(p => p.id !== id));
+  }
 
   return (
     <div className="space-y-6">
@@ -124,14 +138,14 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
+              {(loading ? [] : items).map((product) => (
                 <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-4 px-6">
                     <input type="checkbox" className="rounded" />
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
-                      <Image src={product.image} alt={product.title} width={48} height={48} className="w-12 h-12 rounded-lg object-cover bg-gray-100" />
+                      <Image src={product.image || 'https://via.placeholder.com/80'} alt={product.title} width={48} height={48} className="w-12 h-12 rounded-lg object-cover bg-gray-100" />
                       <div>
                         <p className="font-medium text-gray-900">{product.title}</p>
                         {product.featured && (
@@ -152,7 +166,7 @@ export default function ProductsPage() {
                     </span>
                   </td>
                   <td className="py-4 px-6 text-sm font-medium text-gray-900">
-                    R {product.price.toFixed(2)}
+                    {product.price !== undefined ? `R ${product.price.toFixed(2)}` : '—'}
                   </td>
                   <td className="py-4 px-6">
                     <span className={`text-sm font-medium ${product.stock > 0 ? 'text-gray-900' : 'text-red-600'}`}>
@@ -171,7 +185,7 @@ export default function ProductsPage() {
                           <Edit className="w-4 h-4" />
                         </button>
                       </Link>
-                      <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <button onClick={() => handleDelete(product.id)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                       <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">

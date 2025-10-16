@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -8,11 +8,55 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
+import { getApolloClient } from '@/lib/apollo/client';
+import { CATEGORY_TREE, CREATE_PRODUCT } from '@/lib/api/products';
+import { slugify } from '@/lib/utils';
 import { X, Plus, Upload, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NewProductPage() {
   const router = useRouter();
+  const client = getApolloClient();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<'DRAFT'|'ACTIVE'|'ARCHIVED'>('DRAFT');
+  const [categoryId, setCategoryId] = useState<string>('');
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    client.query({ query: CATEGORY_TREE, fetchPolicy: 'no-cache' }).then(({ data }: { data: any }) => {
+      const flatted: { value: string; label: string }[] = [];
+      function walk(nodes: any[], prefix = '') {
+        for (const n of nodes || []) {
+          flatted.push({ value: n.id, label: prefix ? `${prefix} / ${n.name}` : n.name });
+          if (n.children?.length) walk(n.children, prefix ? `${prefix} / ${n.name}` : n.name);
+        }
+      }
+      walk((data as any).categoryTree || []);
+      setCategories([{ value: '', label: 'Select a category' }, ...flatted]);
+    }).catch(() => setCategories([{ value: '', label: 'Select a category' }]));
+  }, [client]);
+
+  async function handleCreate() {
+    if (!title || !categoryId) return alert('Title and category are required');
+    setSubmitting(true);
+    try {
+      const input = {
+        vendorId: '',
+        categoryId,
+        title,
+        slug: slugify(title),
+        description,
+        status,
+        isActive: status !== 'ARCHIVED',
+      } as any;
+      await client.mutate({ mutation: CREATE_PRODUCT, variables: { input } });
+      router.push('/dashboard/products');
+    } finally {
+      setSubmitting(false);
+    }
+  }
   interface ProductOption { name: string; values: string[] }
   interface ProductVariant { sku: string; price: number; stock: number; attributes: Record<string, string> }
 
@@ -42,7 +86,6 @@ export default function NewProductPage() {
 
   return (
     <div className="space-y-6 max-w-7xl">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/dashboard/products">
           <Button variant="ghost" size="sm">
@@ -56,9 +99,7 @@ export default function NewProductPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information */}
           <Card>
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
@@ -68,12 +109,16 @@ export default function NewProductPage() {
                 label="Product Title"
                 placeholder="e.g. Premium Wireless Headphones"
                 required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
               <Textarea
                 label="Description"
                 placeholder="Describe your product..."
                 rows={6}
                 helperText="Rich text editor for detailed product description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
@@ -89,7 +134,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Media */}
           <Card>
             <CardHeader>
               <CardTitle>Product Media</CardTitle>
@@ -116,7 +160,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Pricing */}
           <Card>
             <CardHeader>
               <CardTitle>Pricing</CardTitle>
@@ -137,7 +180,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Inventory */}
           <Card>
             <CardHeader>
               <CardTitle>Inventory</CardTitle>
@@ -163,7 +205,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Product Options */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -219,7 +260,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Variants */}
           {options.length > 0 && (
             <Card>
               <CardHeader>
@@ -268,7 +308,6 @@ export default function NewProductPage() {
             </Card>
           )}
 
-          {/* SEO */}
           <Card>
             <CardHeader>
               <CardTitle>Search Engine Optimization</CardTitle>
@@ -289,9 +328,7 @@ export default function NewProductPage() {
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Status */}
           <Card>
             <CardHeader>
               <CardTitle>Status</CardTitle>
@@ -302,27 +339,22 @@ export default function NewProductPage() {
                 { value: 'ACTIVE', label: 'Active' },
                 { value: 'ARCHIVED', label: 'Archived' },
               ]}
-              defaultValue="DRAFT"
+              value={status}
+              onChange={(e) => setStatus((e.target as HTMLSelectElement).value as any)}
             />
           </Card>
 
-          {/* Category */}
           <Card>
             <CardHeader>
               <CardTitle>Category</CardTitle>
             </CardHeader>
             <Select
-              options={[
-                { value: '', label: 'Select a category' },
-                { value: 'electronics', label: 'Electronics' },
-                { value: 'furniture', label: 'Furniture' },
-                { value: 'apparel', label: 'Apparel & Accessories' },
-                { value: 'home', label: 'Home & Garden' },
-              ]}
+              options={categories}
+              value={categoryId}
+              onChange={(e) => setCategoryId((e.target as HTMLSelectElement).value)}
             />
           </Card>
 
-          {/* Product Settings */}
           <Card>
             <CardHeader>
               <CardTitle>Product Settings</CardTitle>
@@ -343,7 +375,6 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          {/* Tags */}
           <Card>
             <CardHeader>
               <CardTitle>Tags</CardTitle>
@@ -352,10 +383,9 @@ export default function NewProductPage() {
             <p className="text-xs text-gray-500 mt-2">e.g. wireless, bluetooth, premium</p>
           </Card>
 
-          {/* Actions */}
           <div className="space-y-3">
-            <Button variant="primary" size="lg" className="w-full">
-              Create Product
+            <Button onClick={handleCreate} disabled={submitting} variant="primary" size="lg" className="w-full">
+              {submitting ? 'Creating...' : 'Create Product'}
             </Button>
             <Button variant="outline" size="lg" className="w-full">
               Save as Draft

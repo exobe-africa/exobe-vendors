@@ -46,7 +46,6 @@ export const useAuthStore = create<AuthState>()(
           if (!user) throw new Error('Invalid response from server');
           if (!isVendorRole(user.role)) throw new Error('You do not have access to the vendor portal');
 
-          // Persist token for Apollo auth link
           if (typeof window !== 'undefined' && user.token) {
             localStorage.setItem('token', user.token);
           }
