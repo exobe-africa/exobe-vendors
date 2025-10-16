@@ -13,6 +13,10 @@ import { CATEGORY_TREE, CREATE_PRODUCT } from '@/lib/api/products';
 import { slugify } from '@/lib/utils';
 import { X, Plus, Upload, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { BasicInfoSection } from '../../../../components/pages/products/new/BasicInfoSection';
+import { MediaSection } from '../../../../components/pages/products/new/MediaSection';
+import { OptionsSection } from '../../../../components/pages/products/new/OptionsSection';
+import { VariantsSection } from '../../../../components/pages/products/new/VariantsSection';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -100,65 +104,14 @@ export default function NewProductPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-            </CardHeader>
-            <div className="space-y-4">
-              <Input
-                label="Product Title"
-                placeholder="e.g. Premium Wireless Headphones"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-              <Textarea
-                label="Description"
-                placeholder="Describe your product..."
-                rows={6}
-                helperText="Rich text editor for detailed product description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="SKU"
-                  placeholder="e.g. PROD-001"
-                  helperText="Stock Keeping Unit"
-                />
-                <Input
-                  label="Barcode"
-                  placeholder="e.g. 1234567890"
-                />
-              </div>
-            </div>
-          </Card>
+          <BasicInfoSection
+            title={title}
+            onTitleChange={setTitle}
+            description={description}
+            onDescriptionChange={setDescription}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Media</CardTitle>
-            </CardHeader>
-            <div className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-red-500 transition-colors cursor-pointer">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-sm font-medium text-gray-700 mb-1">Click to upload or drag and drop</p>
-                <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 800x400px)</p>
-              </div>
-              
-              {images.length > 0 && (
-                <div className="grid grid-cols-4 gap-4">
-                  {images.map((img, index) => (
-                    <div key={index} className="relative group">
-                      <Image src={img} alt="" width={200} height={96} className="w-full h-24 object-cover rounded-lg" />
-                      <button className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
+          <MediaSection images={images} />
 
           <Card>
             <CardHeader>
@@ -205,108 +158,14 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Product Options</CardTitle>
-                <Button variant="outline" size="sm" onClick={handleAddOption}>
-                  <Plus className="w-4 h-4" />
-                  Add Option
-                </Button>
-              </div>
-            </CardHeader>
-            <div className="space-y-4">
-              {options.map((option, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1 space-y-3">
-                      <Input
-                        label="Option Name"
-                        placeholder="e.g. Size, Color, Material"
-                        value={option.name}
-                        onChange={(e) => handleOptionNameChange(index, e.target.value)}
-                      />
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                          Option Values
-                        </label>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {option.values.map((value: string, vIndex: number) => (
-                            <span key={vIndex} className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm">
-                              {value}
-                              <button className="text-gray-500 hover:text-red-600">
-                                <X className="w-3 h-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        <Input placeholder="Add value and press Enter" />
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveOption(index)}
-                      className="text-red-600 hover:text-red-700 p-2"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {options.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">
-                  No options added. Click "Add Option" to create product variants.
-                </p>
-              )}
-            </div>
-          </Card>
+          <OptionsSection
+            options={options}
+            onAddOption={handleAddOption}
+            onRemoveOption={handleRemoveOption}
+            onOptionNameChange={handleOptionNameChange}
+          />
 
-          {options.length > 0 && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Product Variants</CardTitle>
-                  <Button variant="outline" size="sm" onClick={handleAddVariant}>
-                    <Plus className="w-4 h-4" />
-                    Add Variant
-                  </Button>
-                </div>
-              </CardHeader>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Variant</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">SKU</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Price</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Stock</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {options[0].values.map((value: string, index: number) => (
-                      <tr key={index} className="border-b border-gray-100">
-                        <td className="py-3 px-4 text-sm text-gray-900">{value}</td>
-                        <td className="py-3 px-4">
-                          <Input placeholder="SKU" className="text-sm" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Input type="number" placeholder="0.00" className="text-sm" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Input type="number" placeholder="0" className="text-sm" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <button className="text-red-600 hover:text-red-700">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          )}
+          <VariantsSection variantLabels={options[0]?.values ?? []} />
 
           <Card>
             <CardHeader>

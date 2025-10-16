@@ -2,14 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Select';
 import { getApolloClient } from '@/lib/apollo/client';
 import { PRODUCT_BY_ID, UPDATE_PRODUCT, DELETE_PRODUCT, CATEGORY_TREE } from '@/lib/api/products';
 import { slugify } from '@/lib/utils';
+import { EditProductForm } from '../../../../../components/pages/products/edit/EditProductForm';
 
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -79,29 +75,20 @@ export default function EditProductPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Product</CardTitle>
-        </CardHeader>
-        <div className="space-y-4 p-6">
-          <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <Textarea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} />
-          <Select
-            options={[{ value: 'DRAFT', label: 'Draft' }, { value: 'ACTIVE', label: 'Active' }, { value: 'ARCHIVED', label: 'Archived' }]}
-            value={status}
-            onChange={(e) => setStatus((e.target as HTMLSelectElement).value as any)}
-          />
-          <Select
-            options={categories}
-            value={categoryId}
-            onChange={(e) => setCategoryId((e.target as HTMLSelectElement).value)}
-          />
-          <div className="flex gap-3">
-            <Button onClick={handleSave} disabled={saving} variant="primary">{saving ? 'Saving...' : 'Save'}</Button>
-            <Button onClick={handleDelete} variant="outline">Delete</Button>
-          </div>
-        </div>
-      </Card>
+      <EditProductForm
+        title={title}
+        onTitleChange={setTitle}
+        description={description}
+        onDescriptionChange={setDescription}
+        status={status}
+        onStatusChange={setStatus}
+        categoryId={categoryId}
+        onCategoryChange={setCategoryId}
+        categories={categories}
+        saving={saving}
+        onSave={handleSave}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
