@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { login } = useAuthStore();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -26,14 +28,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // TODO: Implement actual authentication logic with GraphQL
-      // For now, simulate login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store token (replace with actual token from API)
-      localStorage.setItem('token', 'demo-token');
-      
-      // Redirect to dashboard
+      await login({ email: formData.email, password: formData.password });
       router.push('/dashboard');
     } catch (_err) {
       setError('Invalid email or password. Please try again.');

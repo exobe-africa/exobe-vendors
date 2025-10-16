@@ -13,6 +13,8 @@ import {
   Bell,
   Store
 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/store/auth';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -27,6 +29,11 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user, fetchMe, isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) fetchMe();
+  }, [isAuthenticated, fetchMe]);
 
   return (
     <div className="flex flex-col w-64 bg-gray-900 h-screen fixed left-0 top-0">
@@ -66,11 +73,14 @@ export function Sidebar() {
       <div className="px-4 py-4 border-t border-gray-800">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
-            R
+            {user?.name?.[0]?.toUpperCase() || 'V'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Retailer Store</p>
-            <p className="text-xs text-gray-400 truncate">retailer@store.com</p>
+            <p className="text-sm font-medium text-white truncate">{user?.name || 'Vendor User'}</p>
+            <p className="text-xs text-gray-400 truncate">{user?.email || '—'}</p>
+            {user?.role && (
+              <p className="text-xs text-gray-400 truncate mt-0.5">Role: {user.role}</p>
+            )}
           </div>
         </div>
       </div>

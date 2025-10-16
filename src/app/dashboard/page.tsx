@@ -1,4 +1,7 @@
 'use client';
+import { useEffect } from 'react';
+import { useAuthStore } from '@/store/auth';
+import { useRouter } from 'next/navigation';
 
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { 
@@ -80,12 +83,24 @@ const topProducts = [
 ];
 
 export default function DashboardPage() {
+  const { user, isAuthenticated, fetchMe } = useAuthStore();
+  const router = useRouter();
+  useEffect(() => {
+    fetchMe().then(() => {
+      if (!isAuthenticated || !user || !['RETAILER','WHOLESALER','SERVICE_PROVIDER'].includes(user.role)) {
+        router.push('/login');
+      }
+    });
+  }, [fetchMe, isAuthenticated, user, router]);
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your store today.</p>
+        <p className="text-gray-600 mt-1">Welcome back{user?.name ? `, ${user.name}` : ''}! Here&apos;s what&apos;s happening with your store today.</p>
+        {user?.role && (
+          <p className="text-sm text-gray-500 mt-1">Your role: <span className="font-medium">{user.role}</span></p>
+        )}
       </div>
 
       {/* Stats Grid */}
