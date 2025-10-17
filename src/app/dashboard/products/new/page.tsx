@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
-import { useProductStore } from '@/store/product';
+import { useProductStore, type ProductType } from '@/store/product';
 import { X, Plus, Upload, ArrowLeft, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { BasicInfoSection } from '../../../../components/pages/products/new/BasicInfoSection';
@@ -17,6 +17,8 @@ import { MediaSection } from '../../../../components/pages/products/new/MediaSec
 import { OptionsSection } from '../../../../components/pages/products/new/OptionsSection';
 import { VariantsSection } from '../../../../components/pages/products/new/VariantsSection';
 import { CategorySelector } from '../../../../components/pages/products/new/CategorySelector';
+import { ProductTypeSelector } from '../../../../components/pages/products/new/ProductTypeSelector';
+import { TypeSpecificFields } from '../../../../components/pages/products/new/TypeSpecificFields';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -32,6 +34,7 @@ export default function NewProductPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<'DRAFT'|'ACTIVE'|'ARCHIVED'>('DRAFT');
+  const [productType, setProductType] = useState<ProductType>('GENERAL');
   const [categoryId, setCategoryId] = useState<string>('');
   const [isFeatured, setIsFeatured] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -45,10 +48,17 @@ export default function NewProductPage() {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
   const [dimensionUnit, setDimensionUnit] = useState<'cm' | 'm'>('cm');
+  
+  // Type-specific fields managed dynamically
+  const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  const handleTypeSpecificChange = (name: string, value: any) => {
+    setTypeSpecificData(prev => ({ ...prev, [name]: value }));
+  };
 
   async function handleCreate() {
     if (!title || !categoryId) return alert('Title and category are required');
@@ -59,6 +69,7 @@ export default function NewProductPage() {
         title,
         description,
         status,
+        productType,
         categoryId,
         isFeatured,
         isActive,
@@ -72,6 +83,7 @@ export default function NewProductPage() {
         width,
         height,
         dimensionUnit,
+        ...typeSpecificData, // Include all type-specific fields
         options,
         variants,
         images,
@@ -469,6 +481,7 @@ export default function NewProductPage() {
             options={options}
             variants={variants}
             onVariantsChange={setVariants}
+            productType={productType}
           />
 
           <Card>
@@ -506,6 +519,17 @@ export default function NewProductPage() {
               onChange={(e) => setStatus((e.target as HTMLSelectElement).value as any)}
             />
           </Card>
+
+          <ProductTypeSelector
+            selectedType={productType}
+            onSelect={setProductType}
+          />
+
+          <TypeSpecificFields
+            productType={productType}
+            values={typeSpecificData}
+            onChange={handleTypeSpecificChange}
+          />
 
           <CategorySelector
             categories={categories}

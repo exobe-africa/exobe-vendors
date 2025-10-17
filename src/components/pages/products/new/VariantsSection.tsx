@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Info, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { usesIsbn, type ProductType } from '@/lib/productTypeConfig';
 
 interface ProductOption { 
   name: string; 
@@ -23,9 +24,13 @@ interface Props {
   options: ProductOption[];
   variants: ProductVariant[];
   onVariantsChange: (variants: ProductVariant[]) => void;
+  productType?: ProductType;
 }
 
-export function VariantsSection({ options, variants, onVariantsChange }: Props) {
+export function VariantsSection({ options, variants, onVariantsChange, productType = 'GENERAL' }: Props) {
+  const isBook = usesIsbn(productType);
+  const identifierLabel = isBook ? 'ISBN' : 'SKU';
+  const identifierPlaceholder = isBook ? 'e.g. 978-3-16-148410-0' : 'e.g. PROD-S-BLK';
   useEffect(() => {
     if (options.length === 0 || options.some(opt => opt.values.length === 0)) {
       onVariantsChange([]);
@@ -134,7 +139,7 @@ export function VariantsSection({ options, variants, onVariantsChange }: Props) 
               <div className="group relative">
                 <Info className="w-4 h-4 text-gray-400 cursor-help" />
                 <div className="absolute left-0 top-6 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                  Variants are automatically generated from your options. Set unique SKU, price, and stock for each variant.
+                  Variants are automatically generated from your options. Set unique {identifierLabel}, price, and stock for each variant.
                 </div>
               </div>
             </div>
@@ -167,7 +172,7 @@ export function VariantsSection({ options, variants, onVariantsChange }: Props) 
             <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Variant</span>
           </div>
           <div className="col-span-3">
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">SKU</span>
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">{identifierLabel}</span>
           </div>
           <div className="col-span-2">
             <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Price (ZAR)</span>
@@ -206,7 +211,7 @@ export function VariantsSection({ options, variants, onVariantsChange }: Props) 
 
                   <div className="col-span-3">
                     <Input 
-                      placeholder="e.g. PROD-S-BLK" 
+                      placeholder={identifierPlaceholder}
                       className="text-sm w-full"
                       value={variant.sku}
                       onChange={(e) => handleVariantChange(index, 'sku', e.target.value)}

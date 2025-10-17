@@ -23,11 +23,34 @@ export interface ProductVariant {
   attributes: Record<string, string>;
 }
 
+export type ProductType = 
+  | 'GENERAL'
+  | 'BOOK'
+  | 'EBOOK'
+  | 'ELECTRONICS'
+  | 'CLOTHING'
+  | 'FOOD'
+  | 'BEVERAGE'
+  | 'HEALTH'
+  | 'BEAUTY'
+  | 'SPORTS'
+  | 'TOYS'
+  | 'AUTOMOTIVE'
+  | 'HOME'
+  | 'GARDEN'
+  | 'PET'
+  | 'JEWELRY'
+  | 'ART'
+  | 'MUSIC'
+  | 'SOFTWARE'
+  | 'SERVICE';
+
 export interface ProductFormData {
   title: string;
   description: string;
   status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
   categoryId: string;
+  productType?: ProductType;
   isFeatured: boolean;
   isActive: boolean;
   trackInventory: boolean;
@@ -40,6 +63,39 @@ export interface ProductFormData {
   width?: number;
   height?: number;
   dimensionUnit?: 'cm' | 'm';
+  // Book/eBook fields
+  isbn?: string;
+  author?: string;
+  publisher?: string;
+  publicationDate?: string;
+  pages?: number;
+  language?: string;
+  // General fields
+  brand?: string;
+  model?: string;
+  material?: string;
+  // Food/Beverage fields
+  expiryDate?: string;
+  ingredients?: string;
+  nutritionalInfo?: string;
+  // Care & warranty
+  careInstructions?: string;
+  warrantyPeriod?: number;
+  // Electronics
+  energyRating?: string;
+  // Toys
+  ageRating?: string;
+  // Media
+  artist?: string;
+  genre?: string;
+  format?: string;
+  // Software
+  platform?: string;
+  licenseType?: string;
+  // Service
+  serviceDuration?: string;
+  certification?: string;
+  // Options & variants
   options: ProductOption[];
   variants: ProductVariant[];
   images: string[];
@@ -163,8 +219,39 @@ export const useProductStore = create<ProductState>((set, get) => ({
         slug: slugify(data.title || ''),
         description: data.description,
         status: data.status,
+        productType: data.productType,
         isActive: data.isActive ?? true,
-        // Add other fields as needed
+        deliveryMinDays: data.deliveryMinDays,
+        deliveryMaxDays: data.deliveryMaxDays,
+        weight: data.weight,
+        weightUnit: data.weightUnit,
+        length: data.length,
+        width: data.width,
+        height: data.height,
+        dimensionUnit: data.dimensionUnit,
+        isbn: data.isbn,
+        author: data.author,
+        publisher: data.publisher,
+        publicationDate: data.publicationDate,
+        pages: data.pages,
+        language: data.language,
+        brand: data.brand,
+        model: data.model,
+        material: data.material,
+        expiryDate: data.expiryDate,
+        ingredients: data.ingredients,
+        nutritionalInfo: data.nutritionalInfo,
+        careInstructions: data.careInstructions,
+        warrantyPeriod: data.warrantyPeriod,
+        energyRating: data.energyRating,
+        ageRating: data.ageRating,
+        artist: data.artist,
+        genre: data.genre,
+        format: data.format,
+        platform: data.platform,
+        licenseType: data.licenseType,
+        serviceDuration: data.serviceDuration,
+        certification: data.certification,
       };
 
       const { data: result } = await client.mutate({ 
@@ -190,11 +277,42 @@ export const useProductStore = create<ProductState>((set, get) => ({
       const client = getApolloClient();
       const input = {
         title: data.title,
-        slug: slugify(data.title || ''),
+        slug: data.title ? slugify(data.title) : undefined,
         description: data.description,
         status: data.status,
+        productType: data.productType,
         categoryId: data.categoryId,
-        // Add other fields as needed
+        deliveryMinDays: data.deliveryMinDays,
+        deliveryMaxDays: data.deliveryMaxDays,
+        weight: data.weight,
+        weightUnit: data.weightUnit,
+        length: data.length,
+        width: data.width,
+        height: data.height,
+        dimensionUnit: data.dimensionUnit,
+        isbn: data.isbn,
+        author: data.author,
+        publisher: data.publisher,
+        publicationDate: data.publicationDate,
+        pages: data.pages,
+        language: data.language,
+        brand: data.brand,
+        model: data.model,
+        material: data.material,
+        expiryDate: data.expiryDate,
+        ingredients: data.ingredients,
+        nutritionalInfo: data.nutritionalInfo,
+        careInstructions: data.careInstructions,
+        warrantyPeriod: data.warrantyPeriod,
+        energyRating: data.energyRating,
+        ageRating: data.ageRating,
+        artist: data.artist,
+        genre: data.genre,
+        format: data.format,
+        platform: data.platform,
+        licenseType: data.licenseType,
+        serviceDuration: data.serviceDuration,
+        certification: data.certification,
       };
 
       await client.mutate({ 
