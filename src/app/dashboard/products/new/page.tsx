@@ -22,6 +22,8 @@ import { TypeSpecificFields } from '../../../../components/pages/products/new/Ty
 import { PickupAddressSection } from '../../../../components/pages/products/new/PickupAddressSection';
 import { ReturnPolicySection } from '../../../../components/pages/products/new/ReturnPolicySection';
 import { TagsSection } from '../../../../components/pages/products/new/TagsSection';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/ui/Toast';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -33,6 +35,7 @@ export default function NewProductPage() {
     error, 
     clearError 
   } = useProductStore();
+  const { toasts, success, error: showError, warning, removeToast } = useToast();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -84,9 +87,13 @@ export default function NewProductPage() {
   };
 
   async function handleCreate() {
-    if (!title || !categoryId) return alert('Title and category are required');
+    if (!title || !categoryId) {
+      showError('Title and category are required');
+      return;
+    }
     if (!pickupAddress || !pickupCity || !pickupProvince || !pickupPostalCode) {
-      return alert('Pickup address is required. Please provide the full address where the product will be collected.');
+      showError('Pickup address is required. Please provide the full address where the product will be collected.');
+      return;
     }
     clearError();
     
@@ -128,9 +135,11 @@ export default function NewProductPage() {
         variants,
         images,
       });
+      success('Product created successfully!');
       router.push('/dashboard/products');
     } catch (err) {
       console.error(err);
+      showError(err instanceof Error ? err.message : 'Failed to create product. Please try again.');
     }
   }
   interface ProductOption { name: string; values: string[] }
@@ -170,49 +179,23 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard/products">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-          <p className="text-gray-600 mt-1">Create a new product in your catalog</p>
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-              </div>
-              <div className="mt-4">
-                <div className="-mx-2 -my-1.5 flex">
-                  <button
-                    type="button"
-                    onClick={clearError}
-                    className="bg-red-50 px-2 py-1.5 rounded-md text-sm font-medium text-red-800 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              </div>
-            </div>
+    <>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      
+      <div className="space-y-6 max-w-7xl">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard/products">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+            <p className="text-gray-600 mt-1">Create a new product in your catalog</p>
           </div>
         </div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6 pb-6">
           <BasicInfoSection
             title={title}
@@ -644,7 +627,8 @@ export default function NewProductPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
