@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const publicRoutes = ['/login', '/forgot-password', '/reset-password'];
+  const publicRoutes = ['/login', '/forgot-password', '/reset-password', '/privacy-policy', '/terms-and-conditions'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
   // Expect vendor cookies if you later set them server-side; fallback to token presence check

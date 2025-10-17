@@ -144,7 +144,7 @@ export default function LoginPage() {
           <p className="text-sm text-gray-600">
             Don&apos;t have an account?{' '}
             <Link
-              href="https://exobe.co.za/become-a-seller"
+              href={process.env.NEXT_PUBLIC_SELLER_URL || "https://exobe.africa/sell"}
               className="font-medium text-red-600 hover:text-red-700"
             >
               Apply to become a seller
@@ -153,7 +153,6 @@ export default function LoginPage() {
         </div>
       </Card>
 
-      {/* Help Text */}
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
           Need help?{' '}

@@ -8,7 +8,7 @@ export function Header() {
   const { logout, user } = useAuthStore();
   const router = useRouter();
   return (
-    <header className="bg-white border-b border-gray-200 h-16 fixed top-0 right-0 left-64 z-10">
+    <header className="bg-white border-b border-gray-200 h-16 fixed top-0 right-0 left-64 z-50">
       <div className="h-full px-6 flex items-center justify-between">
         <div className="flex-1 max-w-2xl">
           <div className="relative">

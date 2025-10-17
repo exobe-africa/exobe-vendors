@@ -43,18 +43,13 @@ export function Footer({ variant = 'default', className = '' }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="https://exobe.co.za/become-a-seller" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href={process.env.NEXT_PUBLIC_SELLER_URL || "https://exobe.africa/sell"} className="text-sm text-gray-600 hover:text-gray-900">
                   Become a Seller
                 </Link>
               </li>
               <li>
-                <Link href="https://exobe.co.za" className="text-sm text-gray-600 hover:text-gray-900">
+                <Link href={process.env.NEXT_PUBLIC_FRONTEND_URL || "https://exobe.africa"} className="text-sm text-gray-600 hover:text-gray-900">
                   Shop eXobe
-                </Link>
-              </li>
-              <li>
-                <Link href="https://exobe.co.za/about" className="text-sm text-gray-600 hover:text-gray-900">
-                  About Us
                 </Link>
               </li>
             </ul>
@@ -83,7 +78,6 @@ export function Footer({ variant = 'default', className = '' }: FooterProps) {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
             © {currentYear} eXobe. All rights reserved.

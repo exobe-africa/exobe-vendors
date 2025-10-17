@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
-      <header className="bg-white border-b border-gray-200 py-4 px-6">
+      <header className="bg-white border-b border-gray-200 py-4 px-6 fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <Store className="w-8 h-8 text-red-600" />
@@ -23,7 +23,7 @@ export default function AuthLayout({
               Login
             </Link>
             <Link 
-              href="https://exobe.co.za" 
+              href={process.env.NEXT_PUBLIC_FRONTEND_URL || "https://exobe.africa"}
               className="text-sm font-medium text-red-600 hover:text-red-700"
             >
               Back to eXobe
@@ -32,7 +32,7 @@ export default function AuthLayout({
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-24">
         {children}
       </main>
 
