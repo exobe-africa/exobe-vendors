@@ -7,11 +7,14 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Eye, EyeOff, CheckCircle, Lock } from 'lucide-react';
+import { getApolloClient } from '@/lib/apollo/client';
+import { RESET_PASSWORD } from '@/lib/api/auth';
 
 function ResetPasswordInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const client = getApolloClient();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -61,16 +64,21 @@ function ResetPasswordInner() {
     }
 
     try {
-      // TODO: Implement actual password reset with GraphQL
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await client.mutate({
+        mutation: RESET_PASSWORD,
+        variables: { 
+          token: token!, 
+          newPassword: formData.password 
+        },
+      });
       setSuccess(true);
       
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push('/login');
       }, 2000);
-    } catch (_err) {
-      setError('Failed to reset password. Please try again or request a new reset link.');
+    } catch (err: any) {
+      setError(err?.message || 'Failed to reset password. Please try again or request a new reset link.');
       setLoading(false);
     }
   };

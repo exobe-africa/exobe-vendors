@@ -6,22 +6,29 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import { getApolloClient } from '@/lib/apollo/client';
+import { REQUEST_PASSWORD_RESET } from '@/lib/api/auth';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+  const client = getApolloClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
-      // TODO: Implement actual password reset request with GraphQL
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await client.mutate({
+        mutation: REQUEST_PASSWORD_RESET,
+        variables: { email },
+      });
       setSubmitted(true);
-    } catch (err) {
-      console.error('Password reset error:', err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to send reset email. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -77,6 +84,13 @@ export default function ForgotPasswordPage() {
             No worries! Enter your email address and we&apos;ll send you instructions to reset your password.
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
