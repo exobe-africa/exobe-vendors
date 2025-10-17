@@ -37,6 +37,14 @@ export default function NewProductPage() {
   const [isActive, setIsActive] = useState(true);
   const [trackInventory, setTrackInventory] = useState(true);
   const [allowBackorder, setAllowBackorder] = useState(false);
+  const [deliveryMinDays, setDeliveryMinDays] = useState<number>(1);
+  const [deliveryMaxDays, setDeliveryMaxDays] = useState<number>(3);
+  const [weight, setWeight] = useState<number>(0);
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'g'>('kg');
+  const [length, setLength] = useState<number>(0);
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+  const [dimensionUnit, setDimensionUnit] = useState<'cm' | 'm'>('cm');
 
   useEffect(() => {
     fetchCategories();
@@ -56,6 +64,14 @@ export default function NewProductPage() {
         isActive,
         trackInventory,
         allowBackorder,
+        deliveryMinDays,
+        deliveryMaxDays,
+        weight,
+        weightUnit,
+        length,
+        width,
+        height,
+        dimensionUnit,
         options,
         variants,
         images,
@@ -66,12 +82,10 @@ export default function NewProductPage() {
     }
   }
   interface ProductOption { name: string; values: string[] }
-  interface ProductVariant { sku: string; price: number; stock: number; attributes: Record<string, string> }
+  interface ProductVariant { sku: string; price: number; stock: number; attributes: Record<string, string>; images?: string[] }
 
   const [variants, setVariants] = useState<ProductVariant[]>([]);
-  const [options, setOptions] = useState<ProductOption[]>([
-    { name: 'Size', values: ['Small', 'Medium', 'Large'] },
-  ]);
+  const [options, setOptions] = useState<ProductOption[]>([]);
   const [images, setImages] = useState<string[]>([]);
 
   const handleAddOption = () => {
@@ -80,6 +94,7 @@ export default function NewProductPage() {
 
   const handleRemoveOption = (index: number) => {
     setOptions(options.filter((_, i) => i !== index));
+    // Variants will be regenerated automatically by VariantsSection
   };
 
   const handleOptionNameChange = (index: number, name: string) => {
@@ -88,8 +103,18 @@ export default function NewProductPage() {
     setOptions(updatedOptions);
   };
 
-  const handleAddVariant = () => {
-    setVariants([...variants, { sku: '', price: 0, stock: 0, attributes: {} }]);
+  const handleAddOptionValue = (optionIndex: number, value: string) => {
+    const updatedOptions = [...options];
+    if (!updatedOptions[optionIndex].values.includes(value)) {
+      updatedOptions[optionIndex].values.push(value);
+      setOptions(updatedOptions);
+    }
+  };
+
+  const handleRemoveOptionValue = (optionIndex: number, valueIndex: number) => {
+    const updatedOptions = [...options];
+    updatedOptions[optionIndex].values = updatedOptions[optionIndex].values.filter((_, i) => i !== valueIndex);
+    setOptions(updatedOptions);
   };
 
   return (
@@ -191,14 +216,260 @@ export default function NewProductPage() {
             </div>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <CardTitle>Delivery Timeframe</CardTitle>
+                <div className="group relative">
+                  <svg className="w-4 h-4 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="absolute left-0 top-6 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                    Set the estimated delivery time for this product. This will be displayed to customers at checkout.
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Estimated delivery time displayed to customers
+              </p>
+            </CardHeader>
+            <div className="space-y-4">
+              {/* Quick Presets */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quick Presets
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setDeliveryMinDays(1); setDeliveryMaxDays(2); }}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    1-2 days (Express)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setDeliveryMinDays(2); setDeliveryMaxDays(5); }}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    2-5 days (Standard)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setDeliveryMinDays(5); setDeliveryMaxDays(7); }}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    5-7 days (Economy)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setDeliveryMinDays(7); setDeliveryMaxDays(14); }}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    1-2 weeks
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Minimum Days"
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={deliveryMinDays}
+                  onChange={(e) => setDeliveryMinDays(parseInt(e.target.value) || 1)}
+                  helperText="Shortest delivery time"
+                />
+                <Input
+                  label="Maximum Days"
+                  type="number"
+                  min="1"
+                  placeholder="3"
+                  value={deliveryMaxDays}
+                  onChange={(e) => setDeliveryMaxDays(parseInt(e.target.value) || 3)}
+                  helperText="Longest delivery time"
+                />
+              </div>
+              
+              {/* Preview */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900 mb-1">Customer will see:</p>
+                    <div className="flex items-center gap-2 text-sm text-blue-800">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                      </svg>
+                      <span className="font-medium">
+                        Delivery: {deliveryMinDays === deliveryMaxDays 
+                          ? `${deliveryMinDays} ${deliveryMinDays === 1 ? 'day' : 'days'}`
+                          : `${deliveryMinDays}-${deliveryMaxDays} days`
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <CardTitle>Shipping Dimensions & Weight</CardTitle>
+                <div className="group relative">
+                  <svg className="w-4 h-4 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="absolute left-0 top-6 w-72 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                    These measurements are crucial for logistics planning, shipping cost calculation, and route optimization. Accurate dimensions help carriers determine vehicle capacity and packaging requirements.
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Required for logistics, shipping costs, and supply chain planning
+              </p>
+            </CardHeader>
+            <div className="space-y-6">
+              {/* Weight Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Product Weight
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="col-span-2">
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={weight || ''}
+                      onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                  <Select
+                    options={[
+                      { value: 'kg', label: 'Kilograms (kg)' },
+                      { value: 'g', label: 'Grams (g)' },
+                    ]}
+                    value={weightUnit}
+                    onChange={(e) => setWeightUnit(e.target.value as 'kg' | 'g')}
+                  />
+                </div>
+              </div>
+
+              {/* Dimensions Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Package Dimensions
+                  <span className="text-xs text-gray-500 font-normal ml-2">(Length × Width × Height)</span>
+                </label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-3">
+                    <Input
+                      label="Length"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="0"
+                      value={length || ''}
+                      onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
+                    />
+                    <Input
+                      label="Width"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="0"
+                      value={width || ''}
+                      onChange={(e) => setWidth(parseFloat(e.target.value) || 0)}
+                    />
+                    <Input
+                      label="Height"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="0"
+                      value={height || ''}
+                      onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div>
+                    <Select
+                      label="Unit"
+                      options={[
+                        { value: 'cm', label: 'Centimeters (cm)' },
+                        { value: 'm', label: 'Meters (m)' },
+                      ]}
+                      value={dimensionUnit}
+                      onChange={(e) => setDimensionUnit(e.target.value as 'cm' | 'm')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Calculated Volume Display */}
+              {(length > 0 && width > 0 && height > 0) && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-900 mb-1">Calculated Volume</p>
+                      <div className="space-y-1">
+                        <p className="text-sm text-green-800">
+                          <span className="font-semibold">{(length * width * height).toFixed(2)}</span> {dimensionUnit === 'cm' ? 'cm³' : 'm³'}
+                        </p>
+                        {dimensionUnit === 'cm' && (
+                          <p className="text-xs text-green-700">
+                            ≈ {((length * width * height) / 1000000).toFixed(4)} m³
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Info Banner */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="text-xs text-amber-900">
+                    <p className="font-semibold mb-1">💡 Measurement Tips:</p>
+                    <ul className="space-y-1 ml-2">
+                      <li>• Measure the packaged product (including box/packaging)</li>
+                      <li>• Use the longest side as Length, shortest as Height</li>
+                      <li>• Round up to the nearest unit for accuracy</li>
+                      <li>• Include weight of packaging materials</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
           <OptionsSection
             options={options}
             onAddOption={handleAddOption}
             onRemoveOption={handleRemoveOption}
             onOptionNameChange={handleOptionNameChange}
+            onAddOptionValue={handleAddOptionValue}
+            onRemoveOptionValue={handleRemoveOptionValue}
           />
 
-          <VariantsSection variantLabels={options[0]?.values ?? []} />
+          <VariantsSection 
+            options={options}
+            variants={variants}
+            onVariantsChange={setVariants}
+          />
 
           <Card>
             <CardHeader>

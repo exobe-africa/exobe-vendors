@@ -32,6 +32,14 @@ export interface ProductFormData {
   isActive: boolean;
   trackInventory: boolean;
   allowBackorder: boolean;
+  deliveryMinDays?: number;
+  deliveryMaxDays?: number;
+  weight?: number;
+  weightUnit?: 'kg' | 'g';
+  length?: number;
+  width?: number;
+  height?: number;
+  dimensionUnit?: 'cm' | 'm';
   options: ProductOption[];
   variants: ProductVariant[];
   images: string[];
