@@ -17,6 +17,7 @@ import { BasicInfoSection } from '../../../../components/pages/products/new/Basi
 import { MediaSection } from '../../../../components/pages/products/new/MediaSection';
 import { OptionsSection } from '../../../../components/pages/products/new/OptionsSection';
 import { VariantsSection } from '../../../../components/pages/products/new/VariantsSection';
+import { CategorySelector } from '../../../../components/pages/products/new/CategorySelector';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -25,21 +26,13 @@ export default function NewProductPage() {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<'DRAFT'|'ACTIVE'|'ARCHIVED'>('DRAFT');
   const [categoryId, setCategoryId] = useState<string>('');
-  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [categoryTree, setCategoryTree] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     client.query({ query: CATEGORY_TREE, fetchPolicy: 'no-cache' }).then(({ data }: { data: any }) => {
-      const flatted: { value: string; label: string }[] = [];
-      function walk(nodes: any[], prefix = '') {
-        for (const n of nodes || []) {
-          flatted.push({ value: n.id, label: prefix ? `${prefix} / ${n.name}` : n.name });
-          if (n.children?.length) walk(n.children, prefix ? `${prefix} / ${n.name}` : n.name);
-        }
-      }
-      walk((data as any).categoryTree || []);
-      setCategories([{ value: '', label: 'Select a category' }, ...flatted]);
-    }).catch(() => setCategories([{ value: '', label: 'Select a category' }]));
+      setCategoryTree((data as any).categoryTree || []);
+    }).catch(() => setCategoryTree([]));
   }, [client]);
 
   async function handleCreate() {
@@ -203,16 +196,11 @@ export default function NewProductPage() {
             />
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Category</CardTitle>
-            </CardHeader>
-            <Select
-              options={categories}
-              value={categoryId}
-              onChange={(e) => setCategoryId((e.target as HTMLSelectElement).value)}
-            />
-          </Card>
+          <CategorySelector
+            categories={categoryTree}
+            selectedCategoryId={categoryId}
+            onSelectCategory={setCategoryId}
+          />
 
           <Card>
             <CardHeader>

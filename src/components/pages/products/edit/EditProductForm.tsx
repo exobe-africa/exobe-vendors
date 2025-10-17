@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
+import { CategorySelector } from '../new/CategorySelector';
 
 interface Props {
   title: string;
@@ -15,7 +16,7 @@ interface Props {
   onStatusChange: (v: 'DRAFT' | 'ACTIVE' | 'ARCHIVED') => void;
   categoryId: string;
   onCategoryChange: (v: string) => void;
-  categories: { value: string; label: string }[];
+  categoryTree: any[];
   saving: boolean;
   onSave: () => void;
   onDelete: () => void;
@@ -30,7 +31,7 @@ export function EditProductForm({
   onStatusChange,
   categoryId,
   onCategoryChange,
-  categories,
+  categoryTree,
   saving,
   onSave,
   onDelete,
@@ -62,10 +63,10 @@ export function EditProductForm({
           value={status}
           onChange={(e) => onStatusChange((e.target as HTMLSelectElement).value as any)}
         />
-        <Select
-          options={categories}
-          value={categoryId}
-          onChange={(e) => onCategoryChange((e.target as HTMLSelectElement).value)}
+        <CategorySelector
+          categories={categoryTree}
+          selectedCategoryId={categoryId}
+          onSelectCategory={onCategoryChange}
         />
         <div className="flex gap-3">
           <Button onClick={onSave} disabled={saving} variant="primary">

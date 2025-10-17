@@ -16,7 +16,7 @@ export default function EditProductPage() {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<'DRAFT'|'ACTIVE'|'ARCHIVED'>('DRAFT');
   const [categoryId, setCategoryId] = useState<string>('');
-  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+  const [categoryTree, setCategoryTree] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -34,16 +34,7 @@ export default function EditProductPage() {
         setDescription(p.description || '');
         setStatus((p.status as any) || 'DRAFT');
         setCategoryId(p.categoryId || '');
-
-        const flatted: { value: string; label: string }[] = [];
-        function walk(nodes: any[], prefix = '') {
-          for (const n of nodes || []) {
-            flatted.push({ value: n.id, label: prefix ? `${prefix} / ${n.name}` : n.name });
-            if (n.children?.length) walk(n.children, prefix ? `${prefix} / ${n.name}` : n.name);
-          }
-        }
-        walk((d2 as any).categoryTree || []);
-        setCategories([{ value: '', label: 'Select a category' }, ...flatted]);
+        setCategoryTree((d2 as any).categoryTree || []);
       } finally {
         setLoading(false);
       }
@@ -84,7 +75,7 @@ export default function EditProductPage() {
         onStatusChange={setStatus}
         categoryId={categoryId}
         onCategoryChange={setCategoryId}
-        categories={categories}
+        categoryTree={categoryTree}
         saving={saving}
         onSave={handleSave}
         onDelete={handleDelete}
