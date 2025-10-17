@@ -77,7 +77,6 @@ export interface ProductFormData {
   // Food/Beverage fields
   expiryDate?: string;
   ingredients?: string;
-  nutritionalInfo?: string;
   // Care & warranty
   careInstructions?: string;
   warrantyPeriod?: number;
@@ -240,7 +239,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
         material: data.material,
         expiryDate: data.expiryDate,
         ingredients: data.ingredients,
-        nutritionalInfo: data.nutritionalInfo,
         careInstructions: data.careInstructions,
         warrantyPeriod: data.warrantyPeriod,
         energyRating: data.energyRating,
@@ -301,7 +299,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
         material: data.material,
         expiryDate: data.expiryDate,
         ingredients: data.ingredients,
-        nutritionalInfo: data.nutritionalInfo,
         careInstructions: data.careInstructions,
         warrantyPeriod: data.warrantyPeriod,
         energyRating: data.energyRating,

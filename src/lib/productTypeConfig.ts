@@ -265,14 +265,12 @@ export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Nestlé' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List all ingredients' },
-    { name: 'nutritionalInfo', label: 'Nutritional Info (JSON)', type: 'textarea', placeholder: '{"calories": 250, "protein": "10g"}', helperText: 'JSON format' },
   ],
   
   BEVERAGE: [
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Coca-Cola' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List all ingredients' },
-    { name: 'nutritionalInfo', label: 'Nutritional Info (JSON)', type: 'textarea', placeholder: '{"calories": 140, "sugar": "39g"}', helperText: 'JSON format' },
   ],
   
   HEALTH: [

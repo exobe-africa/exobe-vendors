@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { getFieldsForProductType, type ProductType } from '@/lib/productTypeConfig';
+import { IngredientsBuilder } from './IngredientsBuilder';
 
 interface Props {
   productType: ProductType;
@@ -27,6 +28,17 @@ export function TypeSpecificFields({ productType, values, onChange }: Props) {
       <div className="space-y-4">
         {fields.map((field) => {
           const value = values[field.name];
+          
+          // Special handling for ingredients field
+          if (field.name === 'ingredients') {
+            return (
+              <IngredientsBuilder
+                key={field.name}
+                value={value || ''}
+                onChange={(val) => onChange(field.name, val)}
+              />
+            );
+          }
           
           if (field.type === 'textarea') {
             return (
