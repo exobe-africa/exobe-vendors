@@ -57,7 +57,7 @@ export function OptionsSection({
                   <li>Variants are auto-generated below</li>
                   <li>Set price & stock for each variant</li>
                 </ol>
-                <p className="text-gray-300 italic">Example: Adding Color (Red, Blue) and Size (S, M) creates 4 variants.</p>
+                <p className="text-gray-300 italic">Example: Adding Colour (Red, Blue) and Size (S, M) creates 4 variants.</p>
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@ export function OptionsSection({
               <div className="flex-1 space-y-3">
                 <Input
                   label="Option Name"
-                  placeholder="e.g. Size, Color, Material"
+                  placeholder="e.g. Size, Colour, Material"
                   value={option.name}
                   onChange={(e) => onOptionNameChange(index, e.target.value)}
                 />
@@ -155,7 +155,7 @@ export function OptionsSection({
             </div>
             <p className="text-sm font-medium text-gray-900 mb-1">No options added yet</p>
             <p className="text-xs text-gray-600 mb-4 max-w-md mx-auto">
-              Add options like Size, Color, or Material to create product variants with different prices and stock levels
+              Add options like Size, Colour, or Material to create product variants with different prices and stock levels
             </p>
             
             <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 max-w-md mx-auto text-left">
@@ -167,7 +167,7 @@ export function OptionsSection({
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-medium text-gray-900 min-w-[60px]">Option 2:</span>
-                  <span>Color → Red, Blue, Black</span>
+                  <span>Colour → Red, Blue, Black</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="font-medium text-gray-900 min-w-[60px]">Result:</span>
