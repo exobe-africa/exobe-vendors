@@ -7,20 +7,18 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Eye, EyeOff, CheckCircle, Lock } from 'lucide-react';
-import { getApolloClient } from '@/lib/apollo/client';
-import { RESET_PASSWORD } from '@/lib/api/auth';
+import { useAuthStore } from '@/store/auth';
 
 function ResetPasswordInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const client = getApolloClient();
+  const { resetPassword, isLoading, error, clearError } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
 
   const [formData, setFormData] = useState({
     password: '',
@@ -45,41 +43,32 @@ function ResetPasswordInner() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setLocalError('');
+    clearError();
 
     // Validate password
     const passwordError = validatePassword(formData.password);
     if (passwordError) {
-      setError(passwordError);
-      setLoading(false);
+      setLocalError(passwordError);
       return;
     }
 
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
+      setLocalError('Passwords do not match');
       return;
     }
 
     try {
-      await client.mutate({
-        mutation: RESET_PASSWORD,
-        variables: { 
-          token: token!, 
-          newPassword: formData.password 
-        },
-      });
+      await resetPassword(token!, formData.password);
       setSuccess(true);
       
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push('/login');
       }, 2000);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to reset password. Please try again or request a new reset link.');
-      setLoading(false);
+    } catch (err) {
+      // Error is handled by the store
     }
   };
 
@@ -145,9 +134,9 @@ function ResetPasswordInner() {
         </div>
 
         {/* Error Message */}
-        {error && (
+        {(error || localError) && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-600">{error || localError}</p>
           </div>
         )}
 
@@ -225,9 +214,9 @@ function ResetPasswordInner() {
             variant="primary"
             size="lg"
             className="w-full"
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? (
+            {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Resetting password...

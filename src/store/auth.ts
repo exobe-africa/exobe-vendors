@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApolloClient } from '@/lib/apollo/client';
-import { LOGIN_MUTATION, ME_QUERY } from '@/lib/api/auth';
+import { LOGIN_MUTATION, ME_QUERY, REQUEST_PASSWORD_RESET, RESET_PASSWORD } from '@/lib/api/auth';
 
 export type VendorRole = 'RETAILER' | 'WHOLESALER' | 'SERVICE_PROVIDER';
 
@@ -23,6 +23,9 @@ interface AuthState {
   login: (input: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   fetchMe: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
+  clearError: () => void;
 }
 
 function isVendorRole(role: string | undefined | null): role is VendorRole {
@@ -77,6 +80,40 @@ export const useAuthStore = create<AuthState>()(
         } catch (_) {
           set({ user: null, isAuthenticated: false });
         }
+      },
+
+      async requestPasswordReset(email: string) {
+        set({ isLoading: true, error: null });
+        try {
+          const client = getApolloClient();
+          await client.mutate({
+            mutation: REQUEST_PASSWORD_RESET,
+            variables: { email },
+          });
+          set({ isLoading: false });
+        } catch (e: any) {
+          set({ error: e?.message || 'Failed to send reset email', isLoading: false });
+          throw e;
+        }
+      },
+
+      async resetPassword(token: string, newPassword: string) {
+        set({ isLoading: true, error: null });
+        try {
+          const client = getApolloClient();
+          await client.mutate({
+            mutation: RESET_PASSWORD,
+            variables: { token, newPassword },
+          });
+          set({ isLoading: false });
+        } catch (e: any) {
+          set({ error: e?.message || 'Failed to reset password', isLoading: false });
+          throw e;
+        }
+      },
+
+      clearError() {
+        set({ error: null });
       },
     }),
     { name: 'exobe-vendor-auth', partialize: (s) => ({ user: s.user, isAuthenticated: s.isAuthenticated }) }
