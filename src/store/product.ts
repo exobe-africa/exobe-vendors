@@ -72,6 +72,14 @@ export interface ProductFormData {
   pickupPostalCode?: string;
   pickupCountry?: string;
   pickupInstructions?: string;
+  // Return policy
+  returnPolicyId?: string;
+  returnPolicyName?: string;
+  returnsAccepted?: boolean;
+  returnPeriodDays?: number;
+  returnConditions?: string;
+  restockingFeePct?: number;
+  returnShippingPaidBy?: 'CUSTOMER' | 'VENDOR' | 'SHARED';
   // Book/eBook fields
   isbn?: string;
   author?: string;
@@ -103,6 +111,8 @@ export interface ProductFormData {
   // Service
   serviceDuration?: string;
   certification?: string;
+  // Tags
+  tags?: string[];
   // Options & variants
   options: ProductOption[];
   variants: ProductVariant[];
@@ -245,6 +255,14 @@ export const useProductStore = create<ProductState>((set, get) => ({
         pickupPostalCode: data.pickupPostalCode,
         pickupCountry: data.pickupCountry || 'South Africa',
         pickupInstructions: data.pickupInstructions,
+        returnPolicyId: data.returnPolicyId,
+        returnPolicyName: data.returnPolicyName,
+        returnsAccepted: data.returnsAccepted,
+        returnPeriodDays: data.returnPeriodDays,
+        returnConditions: data.returnConditions,
+        restockingFeePct: data.restockingFeePct,
+        returnShippingPaidBy: data.returnShippingPaidBy,
+        tags: data.tags,
         isbn: data.isbn,
         author: data.author,
         publisher: data.publisher,

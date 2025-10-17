@@ -20,6 +20,8 @@ import { CategorySelector } from '../../../../components/pages/products/new/Cate
 import { ProductTypeSelector } from '../../../../components/pages/products/new/ProductTypeSelector';
 import { TypeSpecificFields } from '../../../../components/pages/products/new/TypeSpecificFields';
 import { PickupAddressSection } from '../../../../components/pages/products/new/PickupAddressSection';
+import { ReturnPolicySection } from '../../../../components/pages/products/new/ReturnPolicySection';
+import { TagsSection } from '../../../../components/pages/products/new/TagsSection';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -58,6 +60,17 @@ export default function NewProductPage() {
   const [pickupPostalCode, setPickupPostalCode] = useState<string>('');
   const [pickupCountry, setPickupCountry] = useState<string>('South Africa');
   const [pickupInstructions, setPickupInstructions] = useState<string>('');
+  
+  // Return policy
+  const [returnPolicyName, setReturnPolicyName] = useState<string>('');
+  const [returnsAccepted, setReturnsAccepted] = useState<boolean>(true);
+  const [returnPeriodDays, setReturnPeriodDays] = useState<number>(30);
+  const [returnConditions, setReturnConditions] = useState<string>('');
+  const [restockingFeePct, setRestockingFeePct] = useState<number>(0);
+  const [returnShippingPaidBy, setReturnShippingPaidBy] = useState<'CUSTOMER' | 'VENDOR' | 'SHARED'>('CUSTOMER');
+  
+  // Tags
+  const [tags, setTags] = useState<string[]>([]);
 
   // Type-specific fields managed dynamically
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
@@ -103,6 +116,13 @@ export default function NewProductPage() {
         pickupPostalCode,
         pickupCountry,
         pickupInstructions,
+        returnPolicyName: returnsAccepted ? returnPolicyName : undefined,
+        returnsAccepted,
+        returnPeriodDays: returnsAccepted ? returnPeriodDays : undefined,
+        returnConditions: returnsAccepted ? returnConditions : undefined,
+        restockingFeePct: returnsAccepted ? restockingFeePct : undefined,
+        returnShippingPaidBy: returnsAccepted ? returnShippingPaidBy : undefined,
+        tags,
         ...typeSpecificData, // Include all type-specific fields
         options,
         variants,
@@ -193,7 +213,7 @@ export default function NewProductPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6 pb-6">
           <BasicInfoSection
             title={title}
             onTitleChange={setTitle}
@@ -505,6 +525,21 @@ export default function NewProductPage() {
             onPickupInstructionsChange={setPickupInstructions}
           />
 
+          <ReturnPolicySection
+            returnPolicyName={returnPolicyName}
+            returnsAccepted={returnsAccepted}
+            returnPeriodDays={returnPeriodDays}
+            returnConditions={returnConditions}
+            restockingFeePct={restockingFeePct}
+            returnShippingPaidBy={returnShippingPaidBy}
+            onReturnPolicyNameChange={setReturnPolicyName}
+            onReturnsAcceptedChange={setReturnsAccepted}
+            onReturnPeriodDaysChange={setReturnPeriodDays}
+            onReturnConditionsChange={setReturnConditions}
+            onRestockingFeePctChange={setRestockingFeePct}
+            onReturnShippingPaidByChange={setReturnShippingPaidBy}
+          />
+
           <OptionsSection
             options={options}
             onAddOption={handleAddOption}
@@ -541,7 +576,7 @@ export default function NewProductPage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           <Card>
             <CardHeader>
               <CardTitle>Status</CardTitle>
@@ -594,13 +629,10 @@ export default function NewProductPage() {
             </div>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Tags</CardTitle>
-            </CardHeader>
-            <Input placeholder="Add tags separated by comma" />
-            <p className="text-xs text-gray-500 mt-2">e.g. wireless, bluetooth, premium</p>
-          </Card>
+          <TagsSection
+            tags={tags}
+            onTagsChange={setTags}
+          />
 
           <div className="space-y-3">
             <Button onClick={handleCreate} disabled={isSubmitting} variant="primary" size="lg" className="w-full">
