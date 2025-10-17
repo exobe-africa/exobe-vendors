@@ -39,7 +39,6 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-md">
       <Card className="p-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Welcome back
@@ -49,7 +48,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -60,7 +58,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input
             label="Email Address"
@@ -132,14 +129,12 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        {/* Divider */}
         <div className="my-6 flex items-center gap-4">
           <div className="flex-1 border-t border-gray-200" />
           <span className="text-sm text-gray-500">or</span>
           <div className="flex-1 border-t border-gray-200" />
         </div>
 
-        {/* Sign Up Link */}
         <div className="text-center">
           <p className="text-sm text-gray-600">
             Don&apos;t have an account?{' '}
@@ -157,7 +152,7 @@ export default function LoginPage() {
         <p className="text-sm text-gray-600">
           Need help?{' '}
           <Link
-            href="mailto:support@exobe.co.za"
+            href="mailto:support@exobe.africa"
             className="font-medium text-red-600 hover:text-red-700"
           >
             Contact Support

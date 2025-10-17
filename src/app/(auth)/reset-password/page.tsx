@@ -63,12 +63,11 @@ function ResetPasswordInner() {
       await resetPassword(token!, formData.password);
       setSuccess(true);
       
-      // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push('/login');
       }, 2000);
     } catch (err) {
-      // Error is handled by the store
+      console.error(err);
     }
   };
 

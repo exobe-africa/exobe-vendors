@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
       await requestPasswordReset(email);
       setSubmitted(true);
     } catch (err) {
-      // Error is handled by the store
+      console.error(err);
     }
   };
 
@@ -63,7 +63,6 @@ export default function ForgotPasswordPage() {
   return (
     <div className="w-full max-w-md">
       <Card className="p-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Mail className="w-8 h-8 text-red-600" />
@@ -76,14 +75,12 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input
             label="Email Address"
@@ -125,12 +122,11 @@ export default function ForgotPasswordPage() {
         </div>
       </Card>
 
-      {/* Help Text */}
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600">
           Still having trouble?{' '}
           <Link
-            href="mailto:support@exobe.co.za"
+            href="mailto:support@exobe.africa"
             className="font-medium text-red-600 hover:text-red-700"
           >
             Contact Support
