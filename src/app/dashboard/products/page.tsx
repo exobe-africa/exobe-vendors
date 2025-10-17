@@ -5,17 +5,21 @@ import { ProductsHeader } from '../../../components/pages/products/ProductsHeade
 import { ProductsFilters } from '../../../components/pages/products/ProductsFilters';
 import { ProductsTable, UiProduct } from '../../../components/pages/products/ProductsTable';
 import { useAuthStore } from '@/store/auth';
-import { getApolloClient } from '@/lib/apollo/client';
-import { SEARCH_PRODUCTS, DELETE_PRODUCT } from '@/lib/api/products';
+import { useProductStore } from '@/store/product';
 
 // UiProduct type imported from ProductsTable component
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [items, setItems] = useState<UiProduct[]>([]);
-  const [loading, setLoading] = useState(false);
-  const client = getApolloClient();
+  const { 
+    products, 
+    fetchProducts, 
+    deleteProduct, 
+    isLoading, 
+    error, 
+    clearError 
+  } = useProductStore();
   const { user } = useAuthStore();
 
   const variables = useMemo(() => ({
@@ -26,37 +30,30 @@ export default function ProductsPage() {
   }), [searchQuery, statusFilter]);
 
   useEffect(() => {
-    let ignore = false;
-    const run = async () => {
-      setLoading(true);
-      try {
-        const { data } = await client.query({ query: SEARCH_PRODUCTS, variables, fetchPolicy: 'no-cache' });
-        const payload = JSON.parse((data as any).searchProducts || '{}');
-        const rows = Array.isArray(payload.items) ? payload.items : [];
-        const mapped: UiProduct[] = rows.map((r: any) => ({
-          id: r.id,
-          title: r.title,
-          category: r.category?.name,
-          status: r.status,
-          price: r.defaultVariant?.priceCents ? r.defaultVariant.priceCents / 100 : undefined,
-          stock: r.defaultVariant?.stockQuantity,
-          image: r.media?.[0]?.url,
-          featured: r.featured,
-        }));
-        if (!ignore) setItems(mapped);
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    };
-    run();
-    return () => { ignore = true; };
-  }, [client, variables]);
+    fetchProducts(variables);
+  }, [fetchProducts, variables]);
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this product?')) return;
-    await client.mutate({ mutation: DELETE_PRODUCT, variables: { id } });
-    setItems(prev => prev.filter(p => p.id !== id));
+    clearError();
+    try {
+      await deleteProduct(id);
+    } catch (err) {
+      console.error(err);
+    }
   }
+
+  // Transform products data for UI
+  const items: UiProduct[] = products.map((r: any) => ({
+    id: r.id,
+    title: r.title,
+    category: r.category?.name,
+    status: r.status,
+    price: r.defaultVariant?.priceCents ? r.defaultVariant.priceCents / 100 : undefined,
+    stock: r.defaultVariant?.stockQuantity,
+    image: r.media?.[0]?.url,
+    featured: r.featured,
+  }));
 
   return (
     <div className="space-y-6">
@@ -67,7 +64,7 @@ export default function ProductsPage() {
         status={statusFilter}
         onStatusChange={setStatusFilter}
       />
-      <ProductsTable items={items} loading={loading} onDelete={handleDelete} />
+      <ProductsTable items={items} loading={isLoading} onDelete={handleDelete} />
     </div>
   );
 }

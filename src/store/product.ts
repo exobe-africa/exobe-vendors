@@ -1,0 +1,235 @@
+'use client';
+
+import { create } from 'zustand';
+import { getApolloClient } from '@/lib/apollo/client';
+import { CATEGORY_TREE, CREATE_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT, SEARCH_PRODUCTS, PRODUCT_BY_ID } from '@/lib/api/products';
+import { slugify } from '@/lib/utils';
+
+export interface Category {
+  id: string;
+  name: string;
+  children?: Category[];
+}
+
+export interface ProductOption {
+  name: string;
+  values: string[];
+}
+
+export interface ProductVariant {
+  sku: string;
+  price: number;
+  stock: number;
+  attributes: Record<string, string>;
+}
+
+export interface ProductFormData {
+  title: string;
+  description: string;
+  status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
+  categoryId: string;
+  isFeatured: boolean;
+  isActive: boolean;
+  trackInventory: boolean;
+  allowBackorder: boolean;
+  options: ProductOption[];
+  variants: ProductVariant[];
+  images: string[];
+}
+
+interface ProductState {
+  // Data
+  categories: Category[];
+  products: any[];
+  
+  // Loading states
+  isLoading: boolean;
+  isSubmitting: boolean;
+  isSaving: boolean;
+  isDeleting: boolean;
+  
+  // Error state
+  error: string | null;
+  
+  // Actions
+  fetchCategories: () => Promise<void>;
+  fetchProducts: (variables?: any) => Promise<void>;
+  fetchProduct: (id: string) => Promise<any>;
+  createProduct: (data: Partial<ProductFormData>) => Promise<string>;
+  updateProduct: (id: string, data: Partial<ProductFormData>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  clearError: () => void;
+}
+
+export const useProductStore = create<ProductState>((set, get) => ({
+  // Initial state
+  categories: [],
+  products: [],
+  isLoading: false,
+  isSubmitting: false,
+  isSaving: false,
+  isDeleting: false,
+  error: null,
+
+  // Fetch categories
+  async fetchCategories() {
+    set({ isLoading: true, error: null });
+    try {
+      const client = getApolloClient();
+      const { data } = await client.query({ 
+        query: CATEGORY_TREE, 
+        fetchPolicy: 'no-cache' 
+      });
+      set({ 
+        categories: (data as any).categoryTree || [],
+        isLoading: false 
+      });
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to fetch categories',
+        isLoading: false 
+      });
+      throw e;
+    }
+  },
+
+  // Fetch products
+  async fetchProducts(variables = {}) {
+    set({ isLoading: true, error: null });
+    try {
+      const client = getApolloClient();
+      const { data } = await client.query({ 
+        query: SEARCH_PRODUCTS, 
+        variables,
+        fetchPolicy: 'no-cache' 
+      });
+      
+      const payload = JSON.parse((data as any).searchProducts || '{}');
+      const rows = Array.isArray(payload.items) ? payload.items : [];
+      
+      set({ 
+        products: rows,
+        isLoading: false 
+      });
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to fetch products',
+        isLoading: false 
+      });
+      throw e;
+    }
+  },
+
+  // Fetch single product
+  async fetchProduct(id: string) {
+    set({ isLoading: true, error: null });
+    try {
+      const client = getApolloClient();
+      const { data } = await client.query({ 
+        query: PRODUCT_BY_ID, 
+        variables: { id },
+        fetchPolicy: 'no-cache' 
+      });
+      
+      const product = (data as any).productById;
+      set({ isLoading: false });
+      return product;
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to fetch product',
+        isLoading: false 
+      });
+      throw e;
+    }
+  },
+
+  // Create product
+  async createProduct(data: Partial<ProductFormData>) {
+    set({ isSubmitting: true, error: null });
+    try {
+      const client = getApolloClient();
+      const input = {
+        vendorId: '',
+        categoryId: data.categoryId,
+        title: data.title,
+        slug: slugify(data.title || ''),
+        description: data.description,
+        status: data.status,
+        isActive: data.isActive ?? true,
+        // Add other fields as needed
+      };
+
+      const { data: result } = await client.mutate({ 
+        mutation: CREATE_PRODUCT, 
+        variables: { input } 
+      });
+      
+      set({ isSubmitting: false });
+      return (result as any).createProduct?.id;
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to create product',
+        isSubmitting: false 
+      });
+      throw e;
+    }
+  },
+
+  // Update product
+  async updateProduct(id: string, data: Partial<ProductFormData>) {
+    set({ isSaving: true, error: null });
+    try {
+      const client = getApolloClient();
+      const input = {
+        title: data.title,
+        slug: slugify(data.title || ''),
+        description: data.description,
+        status: data.status,
+        categoryId: data.categoryId,
+        // Add other fields as needed
+      };
+
+      await client.mutate({ 
+        mutation: UPDATE_PRODUCT, 
+        variables: { id, input } 
+      });
+      
+      set({ isSaving: false });
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to update product',
+        isSaving: false 
+      });
+      throw e;
+    }
+  },
+
+  // Delete product
+  async deleteProduct(id: string) {
+    set({ isDeleting: true, error: null });
+    try {
+      const client = getApolloClient();
+      await client.mutate({ 
+        mutation: DELETE_PRODUCT, 
+        variables: { id } 
+      });
+      
+      // Remove from local state
+      set(state => ({
+        products: state.products.filter(p => p.id !== id),
+        isDeleting: false
+      }));
+    } catch (e: any) {
+      set({ 
+        error: e?.message || 'Failed to delete product',
+        isDeleting: false 
+      });
+      throw e;
+    }
+  },
+
+  // Clear error
+  clearError() {
+    set({ error: null });
+  },
+}));
