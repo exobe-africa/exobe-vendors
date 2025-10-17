@@ -51,6 +51,11 @@ export const useAuthStore = create<AuthState>()(
 
           if (typeof window !== 'undefined' && user.token) {
             localStorage.setItem('token', user.token);
+            try {
+              const maxAge = 60 * 60 * 24 * 7; // 7 days
+              document.cookie = `exobeVendorToken=${encodeURIComponent(user.token)}; Path=/; Max-Age=${maxAge}; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+              document.cookie = `exobeVendorRole=${encodeURIComponent(user.role)}; Path=/; Max-Age=${maxAge}; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+            } catch (_) {}
           }
 
           set({ user, isAuthenticated: true, isLoading: false });
@@ -63,6 +68,10 @@ export const useAuthStore = create<AuthState>()(
       logout() {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
+          try {
+            document.cookie = `exobeVendorToken=; Path=/; Max-Age=0; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+            document.cookie = `exobeVendorRole=; Path=/; Max-Age=0; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+          } catch (_) {}
         }
         set({ user: null, isAuthenticated: false, error: null });
       },

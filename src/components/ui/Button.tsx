@@ -14,7 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props 
 }) => {
-  const baseStyles = 'font-medium rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2';
+  const baseStyles = 'font-medium rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed';
   
   const variants = {
     primary: 'bg-red-600 hover:bg-red-700 text-white shadow-sm disabled:bg-gray-300',

@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
+import { Button, Card, Input } from '@/components/ui';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
@@ -34,6 +32,8 @@ export default function LoginPage() {
       setError('Invalid email or password. Please try again.');
       setLoading(false);
     }
+    // Always clear loading after navigation attempt in case router push is blocked
+    setLoading(false);
   };
 
   return (
