@@ -19,6 +19,7 @@ import { VariantsSection } from '../../../../components/pages/products/new/Varia
 import { CategorySelector } from '../../../../components/pages/products/new/CategorySelector';
 import { ProductTypeSelector } from '../../../../components/pages/products/new/ProductTypeSelector';
 import { TypeSpecificFields } from '../../../../components/pages/products/new/TypeSpecificFields';
+import { PickupAddressSection } from '../../../../components/pages/products/new/PickupAddressSection';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -49,6 +50,15 @@ export default function NewProductPage() {
   const [height, setHeight] = useState<number>(0);
   const [dimensionUnit, setDimensionUnit] = useState<'cm' | 'm'>('cm');
   
+  // Pickup location
+  const [pickupLocationName, setPickupLocationName] = useState<string>('');
+  const [pickupAddress, setPickupAddress] = useState<string>('');
+  const [pickupCity, setPickupCity] = useState<string>('');
+  const [pickupProvince, setPickupProvince] = useState<string>('');
+  const [pickupPostalCode, setPickupPostalCode] = useState<string>('');
+  const [pickupCountry, setPickupCountry] = useState<string>('South Africa');
+  const [pickupInstructions, setPickupInstructions] = useState<string>('');
+
   // Type-specific fields managed dynamically
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
 
@@ -62,6 +72,9 @@ export default function NewProductPage() {
 
   async function handleCreate() {
     if (!title || !categoryId) return alert('Title and category are required');
+    if (!pickupAddress || !pickupCity || !pickupProvince || !pickupPostalCode) {
+      return alert('Pickup address is required. Please provide the full address where the product will be collected.');
+    }
     clearError();
     
     try {
@@ -83,6 +96,13 @@ export default function NewProductPage() {
         width,
         height,
         dimensionUnit,
+        pickupLocationName,
+        pickupAddress,
+        pickupCity,
+        pickupProvince,
+        pickupPostalCode,
+        pickupCountry,
+        pickupInstructions,
         ...typeSpecificData, // Include all type-specific fields
         options,
         variants,
@@ -467,6 +487,23 @@ export default function NewProductPage() {
               </div>
             </div>
           </Card>
+
+          <PickupAddressSection
+            pickupLocationName={pickupLocationName}
+            pickupAddress={pickupAddress}
+            pickupCity={pickupCity}
+            pickupProvince={pickupProvince}
+            pickupPostalCode={pickupPostalCode}
+            pickupCountry={pickupCountry}
+            pickupInstructions={pickupInstructions}
+            onPickupLocationNameChange={setPickupLocationName}
+            onPickupAddressChange={setPickupAddress}
+            onPickupCityChange={setPickupCity}
+            onPickupProvinceChange={setPickupProvince}
+            onPickupPostalCodeChange={setPickupPostalCode}
+            onPickupCountryChange={setPickupCountry}
+            onPickupInstructionsChange={setPickupInstructions}
+          />
 
           <OptionsSection
             options={options}

@@ -63,6 +63,15 @@ export interface ProductFormData {
   width?: number;
   height?: number;
   dimensionUnit?: 'cm' | 'm';
+  // Pickup location for driver collection
+  pickupLocationId?: string;
+  pickupLocationName?: string;
+  pickupAddress?: string;
+  pickupCity?: string;
+  pickupProvince?: string;
+  pickupPostalCode?: string;
+  pickupCountry?: string;
+  pickupInstructions?: string;
   // Book/eBook fields
   isbn?: string;
   author?: string;
@@ -228,6 +237,14 @@ export const useProductStore = create<ProductState>((set, get) => ({
         width: data.width,
         height: data.height,
         dimensionUnit: data.dimensionUnit,
+        pickupLocationId: data.pickupLocationId,
+        pickupLocationName: data.pickupLocationName,
+        pickupAddress: data.pickupAddress,
+        pickupCity: data.pickupCity,
+        pickupProvince: data.pickupProvince,
+        pickupPostalCode: data.pickupPostalCode,
+        pickupCountry: data.pickupCountry || 'South Africa',
+        pickupInstructions: data.pickupInstructions,
         isbn: data.isbn,
         author: data.author,
         publisher: data.publisher,
@@ -288,6 +305,12 @@ export const useProductStore = create<ProductState>((set, get) => ({
         width: data.width,
         height: data.height,
         dimensionUnit: data.dimensionUnit,
+        pickupAddress: data.pickupAddress,
+        pickupCity: data.pickupCity,
+        pickupProvince: data.pickupProvince,
+        pickupPostalCode: data.pickupPostalCode,
+        pickupCountry: data.pickupCountry,
+        pickupInstructions: data.pickupInstructions,
         isbn: data.isbn,
         author: data.author,
         publisher: data.publisher,
