@@ -14,9 +14,10 @@ interface Props {
   categories: Category[];
   selectedCategoryId: string;
   onSelectCategory: (categoryId: string) => void;
+  isLoading?: boolean;
 }
 
-export function CategorySelector({ categories, selectedCategoryId, onSelectCategory }: Props) {
+export function CategorySelector({ categories, selectedCategoryId, onSelectCategory, isLoading = false }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [breadcrumb, setBreadcrumb] = useState<Category[]>([]);
 
@@ -99,15 +100,16 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+              disabled={isLoading}
             />
           </div>
         </div>
 
-        {breadcrumb.length > 0 && (
+        {breadcrumb.length > 0 && !isLoading && (
           <div className="mb-4 flex items-center gap-2 text-sm flex-wrap">
             <button
               onClick={() => handleBreadcrumbClick(-1)}
-              className="text-gray-600 hover:text-gray-900 font-medium"
+              className="text-gray-600 hover:text-gray-900 font-medium cursor-pointer"
             >
               All Categories
             </button>
@@ -116,7 +118,7 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
                 <ChevronRight className="w-4 h-4 text-gray-400" />
                 <button
                   onClick={() => handleBreadcrumbClick(index)}
-                  className="text-gray-600 hover:text-gray-900 font-medium"
+                  className="text-gray-600 hover:text-gray-900 font-medium cursor-pointer"
                 >
                   {cat.name}
                 </button>
@@ -126,7 +128,24 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
         )}
 
         <div className="max-h-80 overflow-y-auto space-y-1">
-          {filteredCategories.length === 0 ? (
+          {isLoading ? (
+            // Skeleton loader
+            <>
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="w-full px-3 py-2.5 rounded-lg flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-5 bg-gray-200 rounded w-24"></div>
+                      <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : filteredCategories.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-8">
               No categories found
             </p>
@@ -141,7 +160,7 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
                   onClick={() => handleCategoryClick(category)}
                   className={`
                     w-full px-3 py-2.5 rounded-lg flex items-center justify-between
-                    transition-colors text-left text-sm
+                    transition-colors text-left text-sm cursor-pointer
                     ${isSelected 
                       ? 'bg-red-50 border border-red-200 text-red-900' 
                       : 'hover:bg-gray-50 border border-transparent'

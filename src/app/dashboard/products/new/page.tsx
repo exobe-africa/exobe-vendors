@@ -31,7 +31,8 @@ export default function NewProductPage() {
     categories, 
     fetchCategories, 
     createProduct, 
-    isSubmitting, 
+    isSubmitting,
+    isLoading,
     error, 
     clearError 
   } = useProductStore();
@@ -182,20 +183,20 @@ export default function NewProductPage() {
     <>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
-      <div className="space-y-6 max-w-7xl">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/products">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-            <p className="text-gray-600 mt-1">Create a new product in your catalog</p>
-          </div>
+    <div className="space-y-6 max-w-7xl">
+      <div className="flex items-center gap-4">
+        <Link href="/dashboard/products">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+          <p className="text-gray-600 mt-1">Create a new product in your catalog</p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6 pb-6">
           <BasicInfoSection
             title={title}
@@ -377,7 +378,7 @@ export default function NewProductPage() {
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2">
-                    <Input
+                      <Input
                       type="number"
                       min="0"
                       step="0.01"
@@ -398,11 +399,11 @@ export default function NewProductPage() {
               </div>
 
               {/* Dimensions Section */}
-              <div>
+                      <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Package Dimensions
                   <span className="text-xs text-gray-500 font-normal ml-2">(Length × Width × Height)</span>
-                </label>
+                        </label>
                 <div className="space-y-3">
                   <div className="grid grid-cols-3 gap-3">
                     <Input
@@ -445,7 +446,7 @@ export default function NewProductPage() {
                     />
                   </div>
                 </div>
-              </div>
+                        </div>
 
               {/* Calculated Volume Display */}
               {(length > 0 && width > 0 && height > 0) && (
@@ -590,6 +591,7 @@ export default function NewProductPage() {
             categories={categories}
             selectedCategoryId={categoryId}
             onSelectCategory={setCategoryId}
+            isLoading={isLoading}
           />
 
           <Card>
@@ -627,7 +629,7 @@ export default function NewProductPage() {
           </div>
         </div>
       </div>
-      </div>
+    </div>
     </>
   );
 }
