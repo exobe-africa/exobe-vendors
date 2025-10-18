@@ -69,7 +69,7 @@ export default function NewProductPage() {
   const [returnPolicyName, setReturnPolicyName] = useState<string>('');
   const [returnsAccepted, setReturnsAccepted] = useState<boolean>(true);
   const [returnPeriodDays, setReturnPeriodDays] = useState<number>(30);
-  const [returnConditions, setReturnConditions] = useState<string>('');
+  const [returnConditions, setReturnConditions] = useState<string[]>([]);
   const [restockingFeePct, setRestockingFeePct] = useState<number>(0);
   const [returnShippingPaidBy, setReturnShippingPaidBy] = useState<'CUSTOMER' | 'VENDOR' | 'SHARED'>('CUSTOMER');
   

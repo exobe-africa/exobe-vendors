@@ -1,22 +1,22 @@
 'use client';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Checkbox } from '@/components/ui/Checkbox';
-import { RotateCcw, Info } from 'lucide-react';
+import { RotateCcw, Info, X, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 interface Props {
   returnPolicyName: string;
   returnsAccepted: boolean;
   returnPeriodDays: number;
-  returnConditions: string;
+  returnConditions: string[];
   restockingFeePct: number;
   returnShippingPaidBy: 'CUSTOMER' | 'VENDOR' | 'SHARED';
   onReturnPolicyNameChange: (value: string) => void;
   onReturnsAcceptedChange: (value: boolean) => void;
   onReturnPeriodDaysChange: (value: number) => void;
-  onReturnConditionsChange: (value: string) => void;
+  onReturnConditionsChange: (value: string[]) => void;
   onRestockingFeePctChange: (value: number) => void;
   onReturnShippingPaidByChange: (value: 'CUSTOMER' | 'VENDOR' | 'SHARED') => void;
 }
@@ -59,9 +59,30 @@ export function ReturnPolicySection({
   onRestockingFeePctChange,
   onReturnShippingPaidByChange,
 }: Props) {
+  const [newCondition, setNewCondition] = useState('');
+
+  const addCondition = (condition: string) => {
+    if (condition.trim()) {
+      onReturnConditionsChange([...returnConditions, condition.trim()]);
+      setNewCondition('');
+    }
+  };
+
   const addPresetCondition = (condition: string) => {
-    const current = returnConditions ? returnConditions + '\n' : '';
-    onReturnConditionsChange(current + '• ' + condition);
+    if (!returnConditions.includes(condition)) {
+      onReturnConditionsChange([...returnConditions, condition]);
+    }
+  };
+
+  const removeCondition = (index: number) => {
+    onReturnConditionsChange(returnConditions.filter((_, i) => i !== index));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCondition(newCondition);
+    }
   };
 
   return (
@@ -118,17 +139,57 @@ export function ReturnPolicySection({
 
             {/* Return Conditions */}
             <div>
-              <Textarea
-                label="Return Conditions"
-                placeholder="E.g., Product must be in original packaging with all tags attached"
-                value={returnConditions}
-                onChange={(e) => onReturnConditionsChange(e.target.value)}
-                rows={4}
-                helperText="Be specific about what condition the product must be in for returns"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Return Conditions
+              </label>
+              <p className="text-sm text-gray-500 mb-3">
+                Be specific about what condition the product must be in for returns
+              </p>
+
+              {/* Existing Conditions List */}
+              {returnConditions.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {returnConditions.map((condition, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg group hover:border-gray-300 transition-colors"
+                    >
+                      <span className="text-gray-700 flex-1 text-sm">{condition}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeCondition(index)}
+                        className="opacity-0 group-hover:opacity-100 text-red-600 hover:text-red-700 transition-opacity cursor-pointer"
+                        title="Remove condition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add New Condition Input */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="E.g., Product must be in original packaging with all tags attached"
+                  value={newCondition}
+                  onChange={(e) => setNewCondition(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => addCondition(newCondition)}
+                  disabled={!newCondition.trim()}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors cursor-pointer flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              </div>
               
               {/* Quick Add Presets */}
-              <div className="mt-2">
+              <div className="mt-3">
                 <p className="text-xs font-medium text-gray-700 mb-2">Quick add common conditions:</p>
                 <div className="flex flex-wrap gap-2">
                   {PRESET_CONDITIONS.map((condition, index) => (
@@ -136,7 +197,8 @@ export function ReturnPolicySection({
                       key={index}
                       type="button"
                       onClick={() => addPresetCondition(condition)}
-                      className="text-xs px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                      disabled={returnConditions.includes(condition)}
+                      className="text-xs px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       + {condition}
                     </button>

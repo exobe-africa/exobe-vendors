@@ -77,7 +77,7 @@ export interface ProductFormData {
   returnPolicyName?: string;
   returnsAccepted?: boolean;
   returnPeriodDays?: number;
-  returnConditions?: string;
+  returnConditions?: string[];
   restockingFeePct?: number;
   returnShippingPaidBy?: 'CUSTOMER' | 'VENDOR' | 'SHARED';
   // Book/eBook fields
