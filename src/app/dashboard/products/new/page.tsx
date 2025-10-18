@@ -205,7 +205,7 @@ export default function NewProductPage() {
             onDescriptionChange={setDescription}
           />
 
-          <MediaSection images={images} />
+          <MediaSection images={images} onImagesChange={setImages} />
 
           <Card>
             <CardHeader>
