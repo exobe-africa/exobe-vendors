@@ -209,7 +209,7 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                     </Link>
                     <button 
                       onClick={(e) => toggleMenu(product.id, e)}
-                      className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
