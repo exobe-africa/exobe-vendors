@@ -11,6 +11,31 @@ export const PRODUCT_BY_ID = gql`
       isActive
       vendorId
       categoryId
+      productType
+      salesCount
+      options { id name position values { id value position } }
+      variants { id sku title priceCents compareAtPriceCents stockQuantity attributes }
+      deliveryMinDays
+      deliveryMaxDays
+      weight
+      weightUnit
+      length
+      width
+      height
+      dimensionUnit
+      tags
+
+      pickupLocation { id name address city province postalCode country instructions }
+      returnPolicy { id name returnsAccepted returnPeriodDays returnConditions restockingFeePct returnShippingPaidBy }
+      warranty { id hasWarranty warrantyPeriod warrantyUnit warrantyDetails }
+
+      bookDetails { id isbn author publisher publicationDate pages language genre format }
+      consumableDetails { id expiryDate ingredients allergens nutritionalInfo }
+      electronicsDetails { id energyRating }
+      mediaDetails { id artist genre format releaseAt }
+      softwareDetails { id platform licenseType }
+      serviceDetails { id serviceDuration }
+      complianceDetails { id ageRating certification }
     }
   }
 `;

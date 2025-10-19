@@ -4,30 +4,47 @@ import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || "http://localhost:4000/graphql";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001/graphql";
 
-let apolloClient: ApolloClient<any> | null = null;
+let apolloClient: ApolloClient | null = null;
 
 function createApolloClient() {
   const errorLink = onError((err) => {
     const graphQLErrors = (err as any).graphQLErrors as { message?: string }[] | undefined;
-    const networkError = (err as any).networkError as unknown;
+    const networkError = (err as any).networkError as any;
+
+    const hardLogout = () => {
+      if (typeof window === 'undefined') return;
+      try {
+        fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: "mutation{ logout }" }),
+          credentials: "include",
+        }).catch(() => {});
+      } catch (_) {}
+      try { localStorage.removeItem('token'); } catch (_) {}
+      try { localStorage.removeItem('exobe-vendor-auth'); } catch (_) {}
+      try {
+        document.cookie = `exobeVendorToken=; Path=/; Max-Age=0; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+        document.cookie = `exobeVendorRole=; Path=/; Max-Age=0; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
+      } catch (_) {}
+      try { if (location.pathname !== '/login') location.href = '/login'; } catch (_) {}
+    };
     if (graphQLErrors) {
       for (const e of graphQLErrors) {
-        if (typeof window !== "undefined" && e?.message && /unauthorized|forbidden/i.test(e.message)) {
-          try {
-            fetch(API_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query: "mutation{ logout }" }),
-              credentials: "include",
-            });
-          } catch (_) {}
+        if (typeof window !== "undefined" && e?.message && /(unauthorized|forbidden|not authenticated|jwt|token)/i.test(e.message)) {
+          hardLogout();
         }
       }
     }
     if (networkError) {
-      console.error('Network error:', networkError);
+      const status = (networkError as any)?.statusCode || (networkError as any)?.status || (networkError as any)?.response?.status;
+      if (status === 401 || status === 403) {
+        hardLogout();
+      } else {
+        console.error('Network error:', networkError);
+      }
     }
   });
 

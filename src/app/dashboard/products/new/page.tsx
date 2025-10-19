@@ -80,10 +80,8 @@ export default function NewProductPage() {
   const [warrantyUnit, setWarrantyUnit] = useState<'months' | 'years'>('months');
   const [warrantyDetails, setWarrantyDetails] = useState<string>('');
   
-  // Tags
   const [tags, setTags] = useState<string[]>([]);
 
-  // Type-specific fields managed dynamically
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -167,7 +165,6 @@ export default function NewProductPage() {
 
   const handleRemoveOption = (index: number) => {
     setOptions(options.filter((_, i) => i !== index));
-    // Variants will be regenerated automatically by VariantsSection
   };
 
   const handleOptionNameChange = (index: number, name: string) => {
@@ -268,6 +265,15 @@ export default function NewProductPage() {
             </div>
           </Card>
 
+          <OptionsSection
+            options={options}
+            onAddOption={handleAddOption}
+            onRemoveOption={handleRemoveOption}
+            onOptionNameChange={handleOptionNameChange}
+            onAddOptionValue={handleAddOptionValue}
+            onRemoveOptionValue={handleRemoveOptionValue}
+          />
+
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -286,7 +292,6 @@ export default function NewProductPage() {
               </p>
             </CardHeader>
             <div className="space-y-4">
-              {/* Quick Presets */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Quick Presets
@@ -549,15 +554,6 @@ export default function NewProductPage() {
             onWarrantyPeriodChange={setWarrantyPeriod}
             onWarrantyUnitChange={setWarrantyUnit}
             onWarrantyDetailsChange={setWarrantyDetails}
-          />
-
-          <OptionsSection
-            options={options}
-            onAddOption={handleAddOption}
-            onRemoveOption={handleRemoveOption}
-            onOptionNameChange={handleOptionNameChange}
-            onAddOptionValue={handleAddOptionValue}
-            onRemoveOptionValue={handleRemoveOptionValue}
           />
 
           <VariantsSection 

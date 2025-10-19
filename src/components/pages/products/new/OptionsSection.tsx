@@ -87,7 +87,7 @@ export function OptionsSection({
       )}
       <div className="space-y-4">
         {options.map((option, index) => (
-          <div key={index} className="border border-gray-200 rounded-lg p-4">
+          <div key={`${index}-${option.name || 'option'}`} className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-start gap-4">
               <div className="flex-1 space-y-3">
                 <Input
@@ -106,7 +106,7 @@ export function OptionsSection({
                   <div className="flex flex-wrap gap-2 mb-2">
                     {option.values.map((value, vIndex) => (
                       <span 
-                        key={vIndex} 
+                        key={`${index}-${value}-${vIndex}`} 
                         className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 border border-red-200 text-red-700 rounded-full text-sm"
                       >
                         {value}

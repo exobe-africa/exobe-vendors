@@ -23,7 +23,7 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
 
   // Get current level categories
   const currentCategories = useMemo(() => {
-    if (breadcrumb.length === 0) return categories;
+    if (breadcrumb.length === 0) return categories || [];
     return breadcrumb[breadcrumb.length - 1].children || [];
   }, [breadcrumb, categories]);
 
@@ -52,7 +52,7 @@ export function CategorySelector({ categories, selectedCategoryId, onSelectCateg
       return null;
     };
     
-    return findPath(categories, selectedCategoryId);
+    return findPath(categories || [], selectedCategoryId);
   }, [categories, selectedCategoryId]);
 
   const handleCategoryClick = (category: Category) => {

@@ -28,7 +28,7 @@ export function TypeSpecificFields({ productType, values, onChange }: Props) {
       </CardHeader>
       <div className="space-y-4">
         {fields.map((field) => {
-          const value = values[field.name];
+          const value = values?.[field.name];
           
           // Special handling for ingredients field
           if (field.name === 'ingredients') {
