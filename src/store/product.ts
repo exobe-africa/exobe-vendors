@@ -336,7 +336,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   // Update product
   async updateProduct(id: string, data: Partial<ProductFormData>) {
-    set({ isSaving: true, error: null });
+    set({ isSubmitting: true, error: null });
     try {
       const client = getApolloClient();
       const mediaUploads = Array.isArray(data.images)
@@ -417,11 +417,11 @@ export const useProductStore = create<ProductState>((set, get) => ({
         variables: { id, input } 
       });
       
-      set({ isSaving: false });
+      set({ isSubmitting: false });
     } catch (e: any) {
       set({ 
         error: e?.message || 'Failed to update product',
-        isSaving: false 
+        isSubmitting: false 
       });
       throw e;
     }

@@ -191,6 +191,32 @@ export default function NewProductPage() {
     <>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
+    {/* Saving Overlay */}
+    {isSubmitting && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+          <div className="flex flex-col items-center space-y-6">
+            {/* Animated Spinner */}
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-red-600 rounded-full animate-spin border-t-transparent"></div>
+            </div>
+            
+            {/* Text */}
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-semibold text-gray-900">Creating Product</h3>
+              <p className="text-sm text-gray-600">Please wait while we add your product...</p>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div className="bg-red-600 h-full rounded-full animate-pulse" style={{ width: '70%' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
     <div className="space-y-6 max-w-7xl">
       <div className="flex items-center gap-4">
         <Link href="/dashboard/products">
