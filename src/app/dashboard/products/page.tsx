@@ -60,6 +60,21 @@ export default function ProductsPage() {
     }
   }
 
+  async function handleStatusChange(id: string, status: string) {
+    clearError();
+    try {
+      // Use the updateProduct method from the store
+      const { updateProduct } = useProductStore.getState();
+      await updateProduct(id, { status });
+      success(`Product status changed to ${status}`);
+      // Refresh the products list
+      await fetchProducts(variables);
+    } catch (err) {
+      console.error(err);
+      showError(err instanceof Error ? err.message : 'Failed to update product status. Please try again.');
+    }
+  }
+
   // Transform products data for UI
   const items: UiProduct[] = products.map((r: any) => ({
     id: r.id,
@@ -94,7 +109,7 @@ export default function ProductsPage() {
           status={statusFilter}
           onStatusChange={setStatusFilter}
         />
-        <ProductsTable items={items} loading={isLoading} onDelete={handleDelete} />
+        <ProductsTable items={items} loading={isLoading} onDelete={handleDelete} onStatusChange={handleStatusChange} />
       </div>
     </>
   );
