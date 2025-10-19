@@ -162,6 +162,13 @@ export default function EditProductPage() {
         // Tags
         setTags(product.tags || []);
 
+        // Media
+        if (Array.isArray((product as any).media) && (product as any).media.length > 0) {
+          setImages((product as any).media.map((m: any) => m.url).filter(Boolean));
+        } else {
+          setImages([]);
+        }
+
         // Type-specific data - populate from related detail tables
         const specificData: Record<string, any> = {};
         

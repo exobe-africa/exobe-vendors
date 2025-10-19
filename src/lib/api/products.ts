@@ -25,6 +25,8 @@ export const PRODUCT_BY_ID = gql`
       dimensionUnit
       tags
 
+      media { id url type position }
+
       pickupLocation { id name address city province postalCode country instructions }
       returnPolicy { id name returnsAccepted returnPeriodDays returnConditions restockingFeePct returnShippingPaidBy }
       warranty { id hasWarranty warrantyPeriod warrantyUnit warrantyDetails }

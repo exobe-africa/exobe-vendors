@@ -237,6 +237,23 @@ export const useProductStore = create<ProductState>((set, get) => ({
     set({ isSubmitting: true, error: null });
     try {
       const client = getApolloClient();
+      // Build media uploads from base64 images (data URLs)
+      const mediaUploads = Array.isArray(data.images)
+        ? data.images
+            .map((src, index) => {
+              if (!src || typeof src !== 'string') return null;
+              if (!src.startsWith('data:image')) return null; // skip existing URLs
+              const [meta, base64] = src.split(',');
+              const match = /data:(image\/[a-zA-Z0-9.+-]+);base64/.exec(meta || '');
+              const contentType = match?.[1] || 'image/png';
+              const ext = contentType.split('/')[1] || 'png';
+              const safeTitle = slugify(data.title || 'product');
+              const filename = `products/${safeTitle}/${Date.now()}-${index}.${ext}`;
+              return { base64, filename, contentType, type: 'IMAGE', position: index };
+            })
+            .filter(Boolean)
+        : undefined;
+
       const input = {
         vendorId: '',
         categoryId: data.categoryId,
@@ -298,6 +315,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
         licenseType: data.licenseType,
         serviceDuration: data.serviceDuration,
         certification: data.certification,
+        mediaUploads,
       };
 
       const { data: result } = await client.mutate({ 
@@ -321,7 +339,23 @@ export const useProductStore = create<ProductState>((set, get) => ({
     set({ isSaving: true, error: null });
     try {
       const client = getApolloClient();
-      const input = {
+      const mediaUploads = Array.isArray(data.images)
+        ? data.images
+            .map((src, index) => {
+              if (!src || typeof src !== 'string') return null;
+              if (!src.startsWith('data:image')) return null; // only new selections
+              const [meta, base64] = src.split(',');
+              const match = /data:(image\/[a-zA-Z0-9.+-]+);base64/.exec(meta || '');
+              const contentType = match?.[1] || 'image/png';
+              const ext = contentType.split('/')[1] || 'png';
+              const safeTitle = slugify(data.title || 'product');
+              const filename = `products/${safeTitle}/${Date.now()}-${index}.${ext}`;
+              return { base64, filename, contentType, type: 'IMAGE', position: index };
+            })
+            .filter(Boolean)
+        : undefined;
+
+      const input: any = {
         title: data.title,
         slug: data.title ? slugify(data.title) : undefined,
         description: data.description,
@@ -344,7 +378,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
         pickupInstructions: data.pickupInstructions,
         isbn: data.isbn,
         author: data.author,
-        publisher: data.publisher,
         publicationDate: data.publicationDate,
         pages: data.pages,
         language: data.language,
@@ -358,14 +391,26 @@ export const useProductStore = create<ProductState>((set, get) => ({
         warrantyPeriod: data.warrantyPeriod,
         energyRating: data.energyRating,
         ageRating: data.ageRating,
-        artist: data.artist,
-        genre: data.genre,
-        format: data.format,
         platform: data.platform,
         licenseType: data.licenseType,
         serviceDuration: data.serviceDuration,
         certification: data.certification,
+        mediaUploads,
       };
+
+      // Only include optional type-specific fields if present (and not null)
+      if (typeof data.publisher === 'string' && data.publisher) (input as any).publisher = data.publisher;
+      if (typeof data.artist === 'string' && data.artist) (input as any).artist = data.artist;
+      if (typeof data.genre === 'string' && data.genre) (input as any).genre = data.genre;
+      if (typeof data.format === 'string' && data.format) (input as any).format = data.format;
+
+      // Remove null/undefined values so GraphQL doesn't reject non-nullable fields with null
+      Object.keys(input).forEach((key) => {
+        const value = (input as any)[key];
+        if (value === null || value === undefined) {
+          delete (input as any)[key];
+        }
+      });
 
       await client.mutate({ 
         mutation: UPDATE_PRODUCT, 
