@@ -94,9 +94,16 @@ export interface ProductFormData {
   // Food/Beverage fields
   expiryDate?: string;
   ingredients?: string;
+  allergens?: string;
   // Care & warranty
   careInstructions?: string;
+  // Warranty fields
+  warrantyId?: string;
+  warrantyName?: string;
+  hasWarranty?: boolean;
   warrantyPeriod?: number;
+  warrantyUnit?: 'months' | 'years';
+  warrantyDetails?: string;
   // Electronics
   energyRating?: string;
   // Toys
@@ -274,8 +281,14 @@ export const useProductStore = create<ProductState>((set, get) => ({
         material: data.material,
         expiryDate: data.expiryDate,
         ingredients: data.ingredients,
+        allergens: data.allergens,
         careInstructions: data.careInstructions,
+        warrantyId: data.warrantyId,
+        warrantyName: data.warrantyName,
+        hasWarranty: data.hasWarranty,
         warrantyPeriod: data.warrantyPeriod,
+        warrantyUnit: data.warrantyUnit,
+        warrantyDetails: data.warrantyDetails,
         energyRating: data.energyRating,
         ageRating: data.ageRating,
         artist: data.artist,
@@ -340,6 +353,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
         material: data.material,
         expiryDate: data.expiryDate,
         ingredients: data.ingredients,
+        allergens: data.allergens,
         careInstructions: data.careInstructions,
         warrantyPeriod: data.warrantyPeriod,
         energyRating: data.energyRating,

@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { getFieldsForProductType, type ProductType } from '@/lib/productTypeConfig';
 import { IngredientsBuilder } from './IngredientsBuilder';
+import { AllergensBuilder } from './AllergensBuilder';
 
 interface Props {
   productType: ProductType;
@@ -33,6 +34,16 @@ export function TypeSpecificFields({ productType, values, onChange }: Props) {
           if (field.name === 'ingredients') {
             return (
               <IngredientsBuilder
+                key={field.name}
+                value={value || ''}
+                onChange={(val) => onChange(field.name, val)}
+              />
+            );
+          }
+          // Special handling for allergens field
+          if (field.name === 'allergens') {
+            return (
+              <AllergensBuilder
                 key={field.name}
                 value={value || ''}
                 onChange={(val) => onChange(field.name, val)}
@@ -75,11 +86,13 @@ export function TypeSpecificFields({ productType, values, onChange }: Props) {
               key={field.name}
               label={field.label + (field.required ? ' *' : '')}
               type={field.type}
+              min={field.type === 'number' ? '0' : undefined}
+              step={field.type === 'number' ? (field.name === 'pages' ? '1' : '0.01') : undefined}
               placeholder={field.placeholder}
               value={value || ''}
               onChange={(e) => {
                 const val = field.type === 'number' 
-                  ? parseInt(e.target.value) || 0 
+                  ? parseFloat(e.target.value) || 0 
                   : e.target.value;
                 onChange(field.name, val);
               }}

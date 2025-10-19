@@ -21,6 +21,7 @@ import { ProductTypeSelector } from '../../../../components/pages/products/new/P
 import { TypeSpecificFields } from '../../../../components/pages/products/new/TypeSpecificFields';
 import { PickupAddressSection } from '../../../../components/pages/products/new/PickupAddressSection';
 import { ReturnPolicySection } from '../../../../components/pages/products/new/ReturnPolicySection';
+import { WarrantySection } from '../../../../components/pages/products/new/WarrantySection';
 import { TagsSection } from '../../../../components/pages/products/new/TagsSection';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -72,6 +73,12 @@ export default function NewProductPage() {
   const [returnConditions, setReturnConditions] = useState<string[]>([]);
   const [restockingFeePct, setRestockingFeePct] = useState<number>(0);
   const [returnShippingPaidBy, setReturnShippingPaidBy] = useState<'CUSTOMER' | 'VENDOR' | 'SHARED'>('CUSTOMER');
+  
+  // Warranty
+  const [hasWarranty, setHasWarranty] = useState<boolean>(false);
+  const [warrantyPeriod, setWarrantyPeriod] = useState<number>(12);
+  const [warrantyUnit, setWarrantyUnit] = useState<'months' | 'years'>('months');
+  const [warrantyDetails, setWarrantyDetails] = useState<string>('');
   
   // Tags
   const [tags, setTags] = useState<string[]>([]);
@@ -130,6 +137,10 @@ export default function NewProductPage() {
         returnConditions: returnsAccepted ? returnConditions : undefined,
         restockingFeePct: returnsAccepted ? restockingFeePct : undefined,
         returnShippingPaidBy: returnsAccepted ? returnShippingPaidBy : undefined,
+        hasWarranty,
+        warrantyPeriod: hasWarranty ? warrantyPeriod : undefined,
+        warrantyUnit: hasWarranty ? warrantyUnit : undefined,
+        warrantyDetails: hasWarranty ? warrantyDetails : undefined,
         tags,
         ...typeSpecificData, // Include all type-specific fields
         options,
@@ -215,12 +226,16 @@ export default function NewProductPage() {
               <Input
                 label="Price"
                 type="number"
+                min="0"
+                step="0.01"
                 placeholder="0.00"
                 helperText="In ZAR"
               />
               <Input
                 label="Compare at Price"
                 type="number"
+                min="0"
+                step="0.01"
                 placeholder="0.00"
                 helperText="Original price for sale display"
               />
@@ -235,6 +250,7 @@ export default function NewProductPage() {
               <Input
                 label="Stock Quantity"
                 type="number"
+                min="0"
                 placeholder="0"
               />
               <Checkbox
@@ -314,7 +330,7 @@ export default function NewProductPage() {
                   min="1"
                   placeholder="1"
                   value={deliveryMinDays}
-                  onChange={(e) => setDeliveryMinDays(parseInt(e.target.value) || 1)}
+                  onChange={(e) => setDeliveryMinDays(Math.max(1, parseInt(e.target.value) || 1))}
                   helperText="Shortest delivery time"
                 />
                 <Input
@@ -323,7 +339,7 @@ export default function NewProductPage() {
                   min="1"
                   placeholder="3"
                   value={deliveryMaxDays}
-                  onChange={(e) => setDeliveryMaxDays(parseInt(e.target.value) || 3)}
+                  onChange={(e) => setDeliveryMaxDays(Math.max(1, parseInt(e.target.value) || 3))}
                   helperText="Longest delivery time"
                 />
               </div>
@@ -384,7 +400,7 @@ export default function NewProductPage() {
                       step="0.01"
                       placeholder="0.00"
                       value={weight || ''}
-                      onChange={(e) => setWeight(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => setWeight(Math.max(0, parseFloat(e.target.value) || 0))}
                     />
                   </div>
                   <Select
@@ -413,7 +429,7 @@ export default function NewProductPage() {
                       step="0.1"
                       placeholder="0"
                       value={length || ''}
-                      onChange={(e) => setLength(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => setLength(Math.max(0, parseFloat(e.target.value) || 0))}
                     />
                     <Input
                       label="Width"
@@ -422,7 +438,7 @@ export default function NewProductPage() {
                       step="0.1"
                       placeholder="0"
                       value={width || ''}
-                      onChange={(e) => setWidth(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => setWidth(Math.max(0, parseFloat(e.target.value) || 0))}
                     />
                     <Input
                       label="Height"
@@ -431,7 +447,7 @@ export default function NewProductPage() {
                       step="0.1"
                       placeholder="0"
                       value={height || ''}
-                      onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => setHeight(Math.max(0, parseFloat(e.target.value) || 0))}
                     />
                   </div>
                   <div>
@@ -522,6 +538,17 @@ export default function NewProductPage() {
             onReturnConditionsChange={setReturnConditions}
             onRestockingFeePctChange={setRestockingFeePct}
             onReturnShippingPaidByChange={setReturnShippingPaidBy}
+          />
+
+          <WarrantySection
+            hasWarranty={hasWarranty}
+            warrantyPeriod={warrantyPeriod}
+            warrantyUnit={warrantyUnit}
+            warrantyDetails={warrantyDetails}
+            onHasWarrantyChange={setHasWarranty}
+            onWarrantyPeriodChange={setWarrantyPeriod}
+            onWarrantyUnitChange={setWarrantyUnit}
+            onWarrantyDetailsChange={setWarrantyDetails}
           />
 
           <OptionsSection

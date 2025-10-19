@@ -1,8 +1,3 @@
-/**
- * Product Type Configuration
- * Defines which fields are relevant for each product type
- */
-
 export type ProductType = 
   | 'GENERAL'
   | 'BOOK'
@@ -207,7 +202,6 @@ export const PRODUCT_TYPE_OPTIONS: ProductTypeOption[] = [
   },
 ];
 
-// Field configurations for each product type
 export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
   GENERAL: [
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Samsung' },
@@ -265,12 +259,14 @@ export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Nestlé' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List all ingredients' },
+    { name: 'allergens', label: 'Allergens', type: 'textarea', placeholder: 'List known allergens (e.g., nuts, dairy, gluten)' },
   ],
   
   BEVERAGE: [
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Coca-Cola' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List all ingredients' },
+    { name: 'allergens', label: 'Allergens', type: 'textarea', placeholder: 'List known allergens (e.g., sulfites, dairy, nuts)' },
   ],
   
   HEALTH: [
@@ -278,11 +274,13 @@ export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
     { name: 'expiryDate', label: 'Expiry Date', type: 'date', required: true },
     { name: 'ingredients', label: 'Active Ingredients', type: 'textarea', placeholder: 'List active ingredients' },
     { name: 'certification', label: 'Certifications', type: 'text', placeholder: 'e.g. FDA Approved, MCC Approved' },
+    { name: 'allergens', label: 'Allergens', type: 'textarea', placeholder: 'List known allergens or irritants' },
   ],
   
   BEAUTY: [
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. L\'Oréal' },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List ingredients' },
+    { name: 'allergens', label: 'Allergens', type: 'textarea', placeholder: 'List known allergens or irritants (e.g., fragrances, parabens, sulfates)' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date' },
   ],
   
@@ -320,6 +318,7 @@ export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
     { name: 'brand', label: 'Brand', type: 'text', placeholder: 'e.g. Royal Canin' },
     { name: 'expiryDate', label: 'Expiry Date', type: 'date' },
     { name: 'ingredients', label: 'Ingredients', type: 'textarea', placeholder: 'List ingredients' },
+    { name: 'allergens', label: 'Allergens', type: 'textarea', placeholder: 'List known allergens (e.g., grains, chicken, dairy)' },
   ],
   
   JEWELRY: [
@@ -370,23 +369,19 @@ export const PRODUCT_TYPE_FIELDS: Record<ProductType, FieldConfig[]> = {
   ],
 };
 
-// Helper function to get product type option
 export function getProductTypeOption(type: ProductType): ProductTypeOption | undefined {
   return PRODUCT_TYPE_OPTIONS.find(opt => opt.value === type);
 }
 
-// Helper function to get fields for a product type
 export function getFieldsForProductType(type: ProductType): FieldConfig[] {
   return PRODUCT_TYPE_FIELDS[type] || [];
 }
 
-// Helper function to check if product type uses ISBN
 export function usesIsbn(type: ProductType): boolean {
   const option = getProductTypeOption(type);
   return option?.usesIsbn || false;
 }
 
-// Helper function to check if product type uses SKU
 export function usesSku(type: ProductType): boolean {
   const option = getProductTypeOption(type);
   return option?.usesSku ?? true;

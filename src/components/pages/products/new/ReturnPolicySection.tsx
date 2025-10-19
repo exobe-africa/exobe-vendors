@@ -21,6 +21,17 @@ interface Props {
   onReturnShippingPaidByChange: (value: 'CUSTOMER' | 'VENDOR' | 'SHARED') => void;
 }
 
+const POLICY_NAME_OPTIONS = [
+  { value: '', label: 'Select a policy name' },
+  { value: 'Standard 30-Day Returns', label: 'Standard 30-Day Returns' },
+  { value: 'Premium Free Returns', label: 'Premium Free Returns' },
+  { value: 'Extended 60-Day Returns', label: 'Extended 60-Day Returns' },
+  { value: 'Final Sale - No Returns', label: 'Final Sale - No Returns' },
+  { value: 'Exchange Only Policy', label: 'Exchange Only Policy' },
+  { value: 'Hassle-Free Returns', label: 'Hassle-Free Returns' },
+  { value: 'custom', label: 'Custom Policy Name...' },
+];
+
 const RETURN_PERIOD_OPTIONS = [
   { value: '', label: 'Select return period' },
   { value: '7', label: '7 days' },
@@ -60,6 +71,17 @@ export function ReturnPolicySection({
   onReturnShippingPaidByChange,
 }: Props) {
   const [newCondition, setNewCondition] = useState('');
+  const [showCustomPolicyName, setShowCustomPolicyName] = useState(false);
+
+  const handlePolicyNameSelect = (value: string) => {
+    if (value === 'custom') {
+      setShowCustomPolicyName(true);
+      onReturnPolicyNameChange('');
+    } else {
+      setShowCustomPolicyName(false);
+      onReturnPolicyNameChange(value);
+    }
+  };
 
   const addCondition = (condition: string) => {
     if (condition.trim()) {
@@ -111,14 +133,25 @@ export function ReturnPolicySection({
         {returnsAccepted && (
           <>
             {/* Policy Name */}
-            <Input
-              label="Policy Name *"
-              placeholder="e.g. Standard 30-Day Returns, Premium Free Returns"
-              value={returnPolicyName}
-              onChange={(e) => onReturnPolicyNameChange(e.target.value)}
-              helperText="Give this policy a memorable name for easy reference across products"
-              required
-            />
+            <div>
+              <Select
+                label="Policy Name *"
+                options={POLICY_NAME_OPTIONS}
+                value={showCustomPolicyName ? 'custom' : (returnPolicyName || '')}
+                onChange={(e) => handlePolicyNameSelect(e.target.value)}
+                helperText="Choose a preset policy name or create your own"
+                required
+              />
+              {showCustomPolicyName && (
+                <div className="mt-2">
+                  <Input
+                    placeholder="Enter custom policy name"
+                    value={returnPolicyName}
+                    onChange={(e) => onReturnPolicyNameChange(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* Return Period */}
             <div>
@@ -143,7 +176,7 @@ export function ReturnPolicySection({
                 Return Conditions
               </label>
               <p className="text-sm text-gray-500 mb-3">
-                Be specific about what condition the product must be in for returns
+                Select common conditions or add your own custom requirements
               </p>
 
               {/* Existing Conditions List */}
@@ -168,10 +201,28 @@ export function ReturnPolicySection({
                 </div>
               )}
 
-              {/* Add New Condition Input */}
+              {/* Quick Add Presets */}
+              <div className="mb-3">
+                <p className="text-xs font-medium text-gray-700 mb-2">Quick add common conditions:</p>
+                <div className="flex flex-wrap gap-2">
+                  {PRESET_CONDITIONS.map((condition, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => addPresetCondition(condition)}
+                      disabled={returnConditions.includes(condition)}
+                      className="text-xs px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      + {condition}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Add Custom Condition Input */}
               <div className="flex gap-2">
                 <Input
-                  placeholder="E.g., Product must be in original packaging with all tags attached"
+                  placeholder="Or enter a custom condition..."
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
                   onKeyDown={handleKeyDown}
@@ -186,24 +237,6 @@ export function ReturnPolicySection({
                   <Plus className="w-4 h-4" />
                   Add
                 </button>
-              </div>
-              
-              {/* Quick Add Presets */}
-              <div className="mt-3">
-                <p className="text-xs font-medium text-gray-700 mb-2">Quick add common conditions:</p>
-                <div className="flex flex-wrap gap-2">
-                  {PRESET_CONDITIONS.map((condition, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => addPresetCondition(condition)}
-                      disabled={returnConditions.includes(condition)}
-                      className="text-xs px-2 py-1 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      + {condition}
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
 
@@ -227,7 +260,10 @@ export function ReturnPolicySection({
                 step="0.01"
                 placeholder="0.00"
                 value={restockingFeePct || ''}
-                onChange={(e) => onRestockingFeePctChange(parseFloat(e.target.value) || 0)}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  onRestockingFeePctChange(Math.min(100, Math.max(0, value)));
+                }}
                 helperText="Percentage fee charged for returns (e.g., 15 = 15%). Leave blank for no fee."
               />
               {restockingFeePct > 0 && (

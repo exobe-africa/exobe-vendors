@@ -78,7 +78,9 @@ export function VariantsSection({ options, variants, onVariantsChange, productTy
   const handleVariantChange = (index: number, field: keyof ProductVariant, value: any) => {
     const updated = [...variants];
     if (field === 'price' || field === 'stock') {
-      updated[index] = { ...updated[index], [field]: parseFloat(value) || 0 };
+      const numValue = parseFloat(value) || 0;
+      // Prevent negative values
+      updated[index] = { ...updated[index], [field]: Math.max(0, numValue) };
     } else {
       updated[index] = { ...updated[index], [field]: value };
     }
