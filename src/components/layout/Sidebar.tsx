@@ -48,8 +48,8 @@ export function Sidebar() {
       <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = item.href === '/dashboard' 
-            ? pathname === item.href  // Dashboard only active on exact match
-            : pathname === item.href || pathname?.startsWith(item.href + '/');  // Other pages active on exact match or sub-pages
+            ? pathname === item.href
+            : pathname === item.href || pathname?.startsWith(item.href + '/');
           return (
             <Link
               key={item.name}
@@ -69,7 +69,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Info */}
       <div className="px-4 py-4 border-t border-gray-800">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
