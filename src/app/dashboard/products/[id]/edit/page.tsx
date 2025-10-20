@@ -223,6 +223,14 @@ export default function EditProductPage() {
 
         setTypeSpecificData(specificData);
 
+        // Prefill base pricing if product-level pricing exists (no variants)
+        if ((product.priceInCents ?? product.price_in_cents) && (!product.variants || product.variants.length === 0)) {
+          const p = product.priceInCents ?? product.price_in_cents;
+          const cp = product.compareAtPriceInCents ?? product.compare_at_price_in_cents;
+          setBasePrice((p || 0) / 100);
+          setCompareAtPrice((cp || 0) / 100);
+        }
+
         // Prefill options/variants if present
         if (Array.isArray(product.options) && product.options.length > 0) {
           setOptions(product.options.map((o:any)=>({ name:o.name, values:o.values?.map((v:any)=>v.value) || [] })));
@@ -268,6 +276,17 @@ export default function EditProductPage() {
       showError('Pickup address is required. Please provide the full address where the product will be collected.');
       return;
     }
+    const hasVariants = options.length > 0 && options.some(o => o.values.length > 0);
+    if (!hasVariants) {
+      if (!basePrice || basePrice <= 0) {
+        showError('Please enter a valid Price in the Pricing section.');
+        return;
+      }
+      if (compareAtPrice && compareAtPrice < basePrice) {
+        showError('Compare at Price must be greater than or equal to Price.');
+        return;
+      }
+    }
     clearError();
     
     try {
@@ -310,6 +329,12 @@ export default function EditProductPage() {
         ...typeSpecificData,
         options,
         variants,
+        ...(hasVariants
+          ? {}
+          : {
+              priceInCents: Math.round(Number(basePrice) * 100),
+              compareAtPriceInCents: compareAtPrice ? Math.round(Number(compareAtPrice) * 100) : undefined,
+            }),
         images,
       });
       success('Product updated successfully!');
@@ -567,6 +592,7 @@ export default function EditProductPage() {
                     helperText="In ZAR"
                     value={basePrice || ''}
                     onChange={(e) => setBasePrice(parseFloat(e.target.value) || 0)}
+                    prefix="R"
                   />
                   <Input
                     label="Compare at Price"
@@ -577,6 +603,7 @@ export default function EditProductPage() {
                     helperText="Original price for sale display"
                     value={compareAtPrice || ''}
                     onChange={(e) => setCompareAtPrice(parseFloat(e.target.value) || 0)}
+                    prefix="R"
                   />
                 </div>
               )}

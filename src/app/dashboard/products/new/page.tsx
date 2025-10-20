@@ -101,6 +101,18 @@ export default function NewProductPage() {
       showError('Pickup address is required. Please provide the full address where the product will be collected.');
       return;
     }
+    // Require base pricing if no variants are defined
+    const hasVariants = options.length > 0 && options.some(o => o.values.length > 0);
+    if (!hasVariants) {
+      if (basePrice === '' || Number(basePrice) <= 0) {
+        showError('Please enter a valid Price in the Pricing section.');
+        return;
+      }
+      if (compareAtPrice !== '' && Number(compareAtPrice) < Number(basePrice)) {
+        showError('Compare at Price must be greater than or equal to Price.');
+        return;
+      }
+    }
     clearError();
     
     try {
@@ -143,6 +155,12 @@ export default function NewProductPage() {
         ...typeSpecificData, // Include all type-specific fields
         options,
         variants,
+        ...(hasVariants
+          ? {}
+          : {
+              priceInCents: basePrice !== '' ? Math.round(Number(basePrice) * 100) : undefined,
+              compareAtPriceInCents: compareAtPrice !== '' ? Math.round(Number(compareAtPrice) * 100) : undefined,
+            }),
         images,
       });
       success('Product created successfully!');
@@ -158,6 +176,8 @@ export default function NewProductPage() {
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [options, setOptions] = useState<ProductOption[]>([]);
   const [images, setImages] = useState<string[]>([]);
+  const [basePrice, setBasePrice] = useState<number | ''>('');
+  const [compareAtPrice, setCompareAtPrice] = useState<number | ''>('');
 
   const handleAddOption = () => {
     setOptions([...options, { name: '', values: [] }]);
@@ -253,6 +273,9 @@ export default function NewProductPage() {
                 step="0.01"
                 placeholder="0.00"
                 helperText="In ZAR"
+                value={basePrice}
+                onChange={(e) => setBasePrice(e.target.value === '' ? '' : Number(e.target.value))}
+                prefix="R"
               />
               <Input
                 label="Compare at Price"
@@ -261,6 +284,9 @@ export default function NewProductPage() {
                 step="0.01"
                 placeholder="0.00"
                 helperText="Original price for sale display"
+                value={compareAtPrice}
+                onChange={(e) => setCompareAtPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                prefix="R"
               />
             </div>
           </Card>

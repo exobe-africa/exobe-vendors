@@ -13,6 +13,8 @@ export const PRODUCT_BY_ID = gql`
       categoryId
       productType
       salesCount
+      priceInCents
+      compareAtPriceInCents
       options { id name position values { id value position } }
       variants { id sku title priceCents compareAtPriceCents stockQuantity attributes }
       deliveryMinDays

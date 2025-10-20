@@ -315,6 +315,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
         licenseType: data.licenseType,
         serviceDuration: data.serviceDuration,
         certification: data.certification,
+        priceInCents: (data as any).priceInCents,
+        compareAtPriceInCents: (data as any).compareAtPriceInCents,
         mediaUploads,
       };
 
@@ -395,6 +397,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
         licenseType: data.licenseType,
         serviceDuration: data.serviceDuration,
         certification: data.certification,
+        priceInCents: (data as any).priceInCents,
+        compareAtPriceInCents: (data as any).compareAtPriceInCents,
         mediaUploads,
       };
 
