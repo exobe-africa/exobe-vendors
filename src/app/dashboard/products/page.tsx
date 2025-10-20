@@ -76,16 +76,32 @@ export default function ProductsPage() {
   }
 
   // Transform products data for UI
-  const items: UiProduct[] = products.map((r: any) => ({
-    id: r.id,
-    title: r.title,
-    category: r.category?.name,
-    status: r.status,
-    price: r.defaultVariant?.priceCents ? r.defaultVariant.priceCents / 100 : undefined,
-    stock: r.defaultVariant?.stockQuantity,
-    image: r.media?.[0]?.url,
-    featured: r.featured,
-  }));
+  const items: UiProduct[] = products.map((r: any) => {
+    // Determine price and stock from product-level fields or variants
+    let price: number | undefined;
+    let stock: number | undefined;
+
+    if (r.variants && r.variants.length > 0) {
+      // If variants exist, use the first variant's data
+      price = r.variants[0]?.priceCents ? r.variants[0].priceCents / 100 : undefined;
+      stock = r.variants[0]?.stockQuantity;
+    } else {
+      // If no variants, use product-level pricing
+      price = r.priceInCents ? r.priceInCents / 100 : undefined;
+      stock = r.stockQuantity;
+    }
+
+    return {
+      id: r.id,
+      title: r.title,
+      category: r.category?.name,
+      status: r.status,
+      price,
+      stock,
+      image: r.media?.[0]?.url,
+      featured: r.featured,
+    };
+  });
 
   return (
     <>
