@@ -23,6 +23,7 @@ import { PickupAddressSection } from '../../../../components/pages/products/new/
 import { ReturnPolicySection } from '../../../../components/pages/products/new/ReturnPolicySection';
 import { WarrantySection } from '../../../../components/pages/products/new/WarrantySection';
 import { TagsSection } from '../../../../components/pages/products/new/TagsSection';
+import { MultiSelect } from '@/components/ui/MultiSelect';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 
@@ -81,6 +82,7 @@ export default function NewProductPage() {
   const [warrantyDetails, setWarrantyDetails] = useState<string>('');
   
   const [tags, setTags] = useState<string[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
 
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
 
@@ -152,6 +154,7 @@ export default function NewProductPage() {
         warrantyUnit: hasWarranty ? warrantyUnit : undefined,
         warrantyDetails: hasWarranty ? warrantyDetails : undefined,
         tags,
+        availableLocations,
         ...typeSpecificData, // Include all type-specific fields
         options,
         variants,
@@ -693,6 +696,25 @@ export default function NewProductPage() {
             tags={tags}
             onTagsChange={setTags}
           />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Locations</CardTitle>
+            </CardHeader>
+            <div className="space-y-4">
+              <MultiSelect
+                label="Locations"
+                options={[
+                  { value: 'Johannesburg', label: 'Johannesburg' },
+                  { value: 'Pretoria', label: 'Pretoria' },
+                ]}
+                value={availableLocations}
+                onChange={setAvailableLocations}
+                placeholder="Select locations where this product is available"
+                helperText="Choose one or more locations"
+              />
+            </div>
+          </Card>
 
           <div className="space-y-3">
             <Button onClick={handleCreate} disabled={isSubmitting} variant="primary" size="lg" className="w-full">

@@ -23,6 +23,7 @@ import { PickupAddressSection } from '../../../../../components/pages/products/n
 import { ReturnPolicySection } from '../../../../../components/pages/products/new/ReturnPolicySection';
 import { WarrantySection } from '../../../../../components/pages/products/new/WarrantySection';
 import { TagsSection } from '../../../../../components/pages/products/new/TagsSection';
+import { MultiSelect } from '@/components/ui/MultiSelect';
 import { useToast } from '@/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { useConfirm } from '@/hooks/useConfirm';
@@ -87,6 +88,7 @@ export default function EditProductPage() {
   const [warrantyDetails, setWarrantyDetails] = useState<string>('');
   
   const [tags, setTags] = useState<string[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
 
   const [typeSpecificData, setTypeSpecificData] = useState<Record<string, any>>({});
   const [salesCount, setSalesCount] = useState<number>(0);
@@ -161,6 +163,7 @@ export default function EditProductPage() {
 
         // Tags
         setTags(product.tags || []);
+        setAvailableLocations(product.availableLocations || product.available_locations || []);
 
         // Media
         if (Array.isArray((product as any).media) && (product as any).media.length > 0) {
@@ -326,6 +329,7 @@ export default function EditProductPage() {
         warrantyUnit: hasWarranty ? warrantyUnit : undefined,
         warrantyDetails: hasWarranty ? warrantyDetails : undefined,
         tags,
+        availableLocations,
         ...typeSpecificData,
         options,
         variants,
@@ -822,6 +826,25 @@ export default function EditProductPage() {
             tags={tags}
             onTagsChange={setTags}
           />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Locations</CardTitle>
+            </CardHeader>
+            <div className="space-y-4">
+              <MultiSelect
+                label="Locations"
+                options={[
+                  { value: 'Johannesburg', label: 'Johannesburg' },
+                  { value: 'Pretoria', label: 'Pretoria' },
+                ]}
+                value={availableLocations}
+                onChange={setAvailableLocations}
+                placeholder="Select locations where this product is available"
+                helperText="Choose one or more locations"
+              />
+            </div>
+          </Card>
 
           <Card>
             <CardHeader>

@@ -120,6 +120,8 @@ export interface ProductFormData {
   certification?: string;
   // Tags
   tags?: string[];
+  // Available locations
+  availableLocations?: string[];
   // Options & variants
   options: ProductOption[];
   variants: ProductVariant[];
@@ -287,6 +289,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
         restockingFeePct: data.restockingFeePct,
         returnShippingPaidBy: data.returnShippingPaidBy,
         tags: data.tags,
+        availableLocations: data.availableLocations,
         isbn: data.isbn,
         author: data.author,
         publisher: data.publisher,
@@ -397,6 +400,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
         licenseType: data.licenseType,
         serviceDuration: data.serviceDuration,
         certification: data.certification,
+        tags: data.tags,
+        availableLocations: data.availableLocations,
         priceInCents: (data as any).priceInCents,
         compareAtPriceInCents: (data as any).compareAtPriceInCents,
         mediaUploads,

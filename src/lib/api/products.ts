@@ -26,6 +26,7 @@ export const PRODUCT_BY_ID = gql`
       height
       dimensionUnit
       tags
+      availableLocations
 
       media { id url type position }
 
