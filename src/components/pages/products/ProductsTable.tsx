@@ -245,7 +245,7 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                   {currentStatus !== 'ACTIVE' && (
                     <button
                       onClick={(e) => handleStatusChange(openMenuId, 'ACTIVE', e)}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer"
                     >
                       <CheckCircle className="w-4 h-4 text-green-600" />
                       Mark as Active
@@ -254,7 +254,7 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                   {currentStatus !== 'DRAFT' && (
                     <button
                       onClick={(e) => handleStatusChange(openMenuId, 'DRAFT', e)}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer"
                     >
                       <FileText className="w-4 h-4 text-gray-600" />
                       Mark as Draft
@@ -263,7 +263,7 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                   {currentStatus !== 'ARCHIVED' && (
                     <button
                       onClick={(e) => handleStatusChange(openMenuId, 'ARCHIVED', e)}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer"
                     >
                       <Archive className="w-4 h-4 text-orange-600" />
                       Archive
@@ -272,7 +272,7 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                   <div className="border-t border-gray-200 my-1"></div>
                   <button
                     onClick={(e) => handleDelete(openMenuId, e)}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete Product
