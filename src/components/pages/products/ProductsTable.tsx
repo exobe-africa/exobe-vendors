@@ -22,14 +22,16 @@ export interface UiProduct {
 interface Props {
   items: UiProduct[];
   loading: boolean;
-  onDelete: (id: string) => void;
-  onStatusChange?: (id: string, status: string) => void;
+  onDelete: (id: string) => Promise<void>;
+  onStatusChange?: (id: string, status: string) => Promise<void>;
 }
 
 export function ProductsTable({ items, loading, onDelete, onStatusChange }: Props) {
   const router = useRouter();
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
 
   const handleRowClick = (productId: string, e: React.MouseEvent) => {
     // Don't navigate if clicking on interactive elements
@@ -58,18 +60,43 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
     }
   };
 
-  const handleStatusChange = (productId: string, status: string, e: React.MouseEvent) => {
+  const handleStatusChange = async (productId: string, status: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setOpenMenuId(null);
-    if (onStatusChange) {
-      onStatusChange(productId, status);
+    
+    // Show loading overlay
+    const statusText = status === 'ACTIVE' ? 'Active' : status === 'DRAFT' ? 'Draft' : 'Archived';
+    setUpdateMessage(`Updating product status to ${statusText}...`);
+    setIsUpdating(true);
+    
+    try {
+      if (onStatusChange) {
+        await onStatusChange(productId, status);
+      }
+    } catch (error) {
+      console.error('Error updating product status:', error);
+    } finally {
+      // Hide loading overlay after operation completes
+      setIsUpdating(false);
     }
   };
 
-  const handleDelete = (productId: string, e: React.MouseEvent) => {
+  const handleDelete = async (productId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setOpenMenuId(null);
-    onDelete(productId);
+    
+    // Show loading overlay
+    setUpdateMessage('Deleting product...');
+    setIsUpdating(true);
+    
+    try {
+      await onDelete(productId);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    } finally {
+      // Hide loading overlay after operation completes
+      setIsUpdating(false);
+    }
   };
   if (loading) {
     return (
@@ -300,6 +327,20 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
           </Button>
         </div>
       </div>
+
+      {/* Loading Overlay */}
+      {isUpdating && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center gap-4 min-w-[300px]">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-16 h-16 border-4 border-red-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <p className="text-lg font-medium text-gray-900">{updateMessage}</p>
+            <p className="text-sm text-gray-500">Please wait...</p>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
