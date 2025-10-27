@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApolloClient } from '@/lib/apollo/client';
+import { useProductStore } from '@/store/product';
 import { LOGIN_MUTATION, ME_QUERY, REQUEST_PASSWORD_RESET, RESET_PASSWORD } from '@/lib/api/auth';
 
 export type VendorRole = 'RETAILER' | 'WHOLESALER' | 'SERVICE_PROVIDER';
@@ -58,6 +59,7 @@ export const useAuthStore = create<AuthState>()(
             } catch (_) {}
           }
 
+          try { useProductStore.getState().clearProducts(); } catch (_) {}
           set({ user, isAuthenticated: true, isLoading: false });
         } catch (e: any) {
           set({ error: e?.message || 'Login failed', isAuthenticated: false, user: null, isLoading: false });
@@ -73,6 +75,7 @@ export const useAuthStore = create<AuthState>()(
             document.cookie = `exobeVendorRole=; Path=/; Max-Age=0; SameSite=Lax` + (location.protocol === 'https:' ? '; Secure' : '');
           } catch (_) {}
         }
+        try { useProductStore.getState().clearProducts(); } catch (_) {}
         set({ user: null, isAuthenticated: false, error: null });
       },
 
@@ -82,8 +85,10 @@ export const useAuthStore = create<AuthState>()(
           const { data } = await client.query({ query: ME_QUERY, fetchPolicy: 'no-cache' });
           const me = (data as any)?.me as AuthUser | undefined;
           if (me && isVendorRole(me.role)) {
+            try { useProductStore.getState().clearProducts(); } catch (_) {}
             set({ user: me, isAuthenticated: true });
           } else {
+            try { useProductStore.getState().clearProducts(); } catch (_) {}
             set({ user: null, isAuthenticated: false });
           }
         } catch (_) {

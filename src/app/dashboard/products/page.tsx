@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useLayoutEffect } from 'react';
+import { gql } from '@apollo/client';
+import { getApolloClient } from '@/lib/apollo/client';
 import { ProductsHeader } from '../../../components/pages/products/ProductsHeader';
 import { ProductsFilters } from '../../../components/pages/products/ProductsFilters';
 import { ProductsTable, UiProduct } from '../../../components/pages/products/ProductsTable';
@@ -16,28 +18,66 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [vendorId, setVendorId] = useState<string | undefined>(undefined);
   const { 
     products, 
     fetchProducts, 
     deleteProduct, 
     isLoading, 
     error, 
-    clearError 
+    clearError,
+    clearProducts,
   } = useProductStore();
   const { user } = useAuthStore();
   const { toasts, success, error: showError, warning, removeToast } = useToast();
   const confirmDialog = useConfirm();
 
+  // Fetch vendor ID for the logged-in user
+  useEffect(() => {
+    async function fetchVendorId() {
+      if (!user?.id) return;
+      
+      try {
+        const client = getApolloClient();
+        const { data } = await client.query({
+          query: gql`
+            query GetVendorByUserId($userId: String!) {
+              vendorByUserId(userId: $userId) {
+                id
+              }
+            }
+          `,
+          variables: { userId: user.id },
+          fetchPolicy: 'network-only',
+        });
+        
+        if (data?.vendorByUserId?.id) {
+          setVendorId(data.vendorByUserId.id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch vendor ID:', err);
+      }
+    }
+    
+    fetchVendorId();
+  }, [user?.id]);
+
   const variables = useMemo(() => ({
     query: searchQuery || undefined,
     status: statusFilter === 'all' ? undefined : statusFilter,
-    vendorId: undefined as string | undefined, // backend infers by user; pass if you store vendorId
+    vendorId: vendorId,
     limit: 50,
-  }), [searchQuery, statusFilter]);
+  }), [searchQuery, statusFilter, vendorId]);
+
+  // Clear stale products synchronously before paint when account/vendor changes
+  useLayoutEffect(() => {
+    clearProducts();
+  }, [user?.id, vendorId]);
 
   useEffect(() => {
+    if (!vendorId) return;
     fetchProducts(variables);
-  }, [fetchProducts, variables]);
+  }, [vendorId, searchQuery, statusFilter]);
 
   async function handleDelete(id: string) {
     const confirmed = await confirmDialog.confirm({

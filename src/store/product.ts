@@ -150,6 +150,7 @@ interface ProductState {
   updateProduct: (id: string, data: Partial<ProductFormData>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   clearError: () => void;
+  clearProducts: () => void;
 }
 
 export const useProductStore = create<ProductState>((set, get) => ({
@@ -186,7 +187,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   // Fetch products
   async fetchProducts(variables = {}) {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, products: [] });
     try {
       const client = getApolloClient();
       const { data } = await client.query({ 
@@ -463,5 +464,10 @@ export const useProductStore = create<ProductState>((set, get) => ({
   // Clear error
   clearError() {
     set({ error: null });
+  },
+
+  // Clear products (e.g., when user logs out or switches)
+  clearProducts() {
+    set({ products: [] });
   },
 }));
