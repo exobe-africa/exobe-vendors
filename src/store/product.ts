@@ -63,7 +63,6 @@ export interface ProductFormData {
   width?: number;
   height?: number;
   dimensionUnit?: 'cm' | 'm';
-  // Pickup location for driver collection
   pickupLocationId?: string;
   pickupLocationName?: string;
   pickupAddress?: string;
@@ -72,7 +71,6 @@ export interface ProductFormData {
   pickupPostalCode?: string;
   pickupCountry?: string;
   pickupInstructions?: string;
-  // Return policy
   returnPolicyId?: string;
   returnPolicyName?: string;
   returnsAccepted?: boolean;
@@ -80,69 +78,52 @@ export interface ProductFormData {
   returnConditions?: string[];
   restockingFeePct?: number;
   returnShippingPaidBy?: 'CUSTOMER' | 'VENDOR' | 'SHARED';
-  // Book/eBook fields
   isbn?: string;
   author?: string;
   publisher?: string;
   publicationDate?: string;
   pages?: number;
   language?: string;
-  // General fields
   brand?: string;
   model?: string;
   material?: string;
-  // Food/Beverage fields
   expiryDate?: string;
   ingredients?: string;
   allergens?: string;
-  // Care & warranty
   careInstructions?: string;
-  // Warranty fields
   warrantyId?: string;
   warrantyName?: string;
   hasWarranty?: boolean;
   warrantyPeriod?: number;
   warrantyUnit?: 'months' | 'years';
   warrantyDetails?: string;
-  // Electronics
   energyRating?: string;
-  // Toys
   ageRating?: string;
-  // Media
   artist?: string;
   genre?: string;
   format?: string;
-  // Software
   platform?: string;
   licenseType?: string;
-  // Service
   serviceDuration?: string;
   certification?: string;
-  // Tags
   tags?: string[];
-  // Available locations
   availableLocations?: string[];
-  // Options & variants
   options: ProductOption[];
   variants: ProductVariant[];
   images: string[];
 }
 
 interface ProductState {
-  // Data
   categories: Category[];
   products: any[];
   
-  // Loading states
   isLoading: boolean;
   isSubmitting: boolean;
   isSaving: boolean;
   isDeleting: boolean;
   
-  // Error state
   error: string | null;
   
-  // Actions
   fetchCategories: () => Promise<void>;
   fetchProducts: (variables?: any) => Promise<void>;
   fetchProduct: (id: string) => Promise<any>;
@@ -154,7 +135,6 @@ interface ProductState {
 }
 
 export const useProductStore = create<ProductState>((set, get) => ({
-  // Initial state
   categories: [],
   products: [],
   isLoading: false,
@@ -163,7 +143,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
   isDeleting: false,
   error: null,
 
-  // Fetch categories
   async fetchCategories() {
     set({ isLoading: true, error: null });
     try {
@@ -185,7 +164,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Fetch products
   async fetchProducts(variables = {}) {
     set({ isLoading: true, error: null, products: [] });
     try {
@@ -212,7 +190,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Fetch single product
   async fetchProduct(id: string) {
     set({ isLoading: true, error: null });
     try {
@@ -235,7 +212,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Create product
   async createProduct(data: Partial<ProductFormData>) {
     set({ isSubmitting: true, error: null });
     try {
@@ -340,7 +316,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Update product
   async updateProduct(id: string, data: Partial<ProductFormData>) {
     set({ isSubmitting: true, error: null });
     try {
@@ -437,7 +412,6 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Delete product
   async deleteProduct(id: string) {
     set({ isDeleting: true, error: null });
     try {
@@ -461,12 +435,10 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  // Clear error
   clearError() {
     set({ error: null });
   },
 
-  // Clear products (e.g., when user logs out or switches)
   clearProducts() {
     set({ products: [] });
   },
