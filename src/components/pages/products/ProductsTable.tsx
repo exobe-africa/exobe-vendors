@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Edit, Trash2, MoreVertical, CheckCircle, XCircle, FileText, Archive } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, CheckCircle, XCircle, FileText, Archive, ExternalLink } from 'lucide-react';
 
 export interface UiProduct {
   id: string;
@@ -149,7 +149,6 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                       <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
                       <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
                       <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
-                      <div className="w-8 h-8 bg-gray-200 rounded-lg animate-pulse"></div>
                     </div>
                   </td>
                 </tr>
@@ -229,6 +228,17 @@ export function ProductsTable({ items, loading, onDelete, onStatusChange }: Prop
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://exobe-ecommerce.vercel.app';
+                        window.open(`${frontendUrl}/product/${product.id}`, '_blank');
+                      }}
+                      className="p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
+                      title="Open in Store (New Tab)"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
                     <Link href={`/dashboard/products/${product.id}/edit`} onClick={(e) => e.stopPropagation()}>
                       <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
                         <Edit className="w-4 h-4" />
